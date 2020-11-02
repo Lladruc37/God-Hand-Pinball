@@ -15,6 +15,7 @@
 ModulePhysics::ModulePhysics(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	world = NULL;
+	mouse_joint = NULL;
 	debug = true;
 }
 
@@ -30,6 +31,10 @@ bool ModulePhysics::Start()
 	world = new b2World(b2Vec2(GRAVITY_X, -GRAVITY_Y));
 	// TODO 3: You need to make ModulePhysics class a contact listener
 	world->SetContactListener(this);
+
+	// needed to create joints like mouse joint
+	b2BodyDef bd;
+	ground = world->CreateBody(&bd);
 
 	// big static circle as "ground" in the middle of the screen
 	int x = SCREEN_WIDTH / 2;
@@ -57,12 +62,16 @@ update_status ModulePhysics::PreUpdate()
 {
 	world->Step(1.0f / 60.0f, 6, 2);
 
-	// TODO: HomeWork
-	/*
-	for(b2Contact* c = world->GetContactList(); c; c = c->GetNext())
+	for (b2Contact* c = world->GetContactList(); c; c = c->GetNext())
 	{
+		if (c->GetFixtureA()->IsSensor() && c->IsTouching())
+		{
+			PhysBody* pb1 = (PhysBody*)c->GetFixtureA()->GetBody()->GetUserData();
+			PhysBody* pb2 = (PhysBody*)c->GetFixtureA()->GetBody()->GetUserData();
+			if (pb1 && pb2 && pb1->listener)
+				pb1->listener->OnCollision(pb1, pb2);
+		}
 	}
-	*/
 
 	return UPDATE_CONTINUE;
 }
@@ -83,11 +92,10 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius)
 
 	b->CreateFixture(&fixture);
 
-	// TODO 4: add a pointer to PhysBody as UserData to the body
 	PhysBody* pbody = new PhysBody();
 	pbody->body = b;
-	pbody->width = pbody->height = radius;
 	b->SetUserData(pbody);
+	pbody->width = pbody->height = radius;
 
 	return pbody;
 }
@@ -110,12 +118,40 @@ PhysBody* ModulePhysics::CreateRectangle(int x, int y, int width, int height)
 
 	PhysBody* pbody = new PhysBody();
 	pbody->body = b;
+	b->SetUserData(pbody);
 	pbody->width = width * 0.5f;
 	pbody->height = height * 0.5f;
-	b->SetUserData(pbody);
 
 	return pbody;
 }
+
+PhysBody* ModulePhysics::CreateRectangleSensor(int x, int y, int width, int height)
+{
+	b2BodyDef body;
+	body.type = b2_staticBody;
+	body.position.Set(PIXEL_TO_METERS(x), PIXEL_TO_METERS(y));
+
+	b2Body* b = world->CreateBody(&body);
+
+	b2PolygonShape box;
+	box.SetAsBox(PIXEL_TO_METERS(width) * 0.5f, PIXEL_TO_METERS(height) * 0.5f);
+
+	b2FixtureDef fixture;
+	fixture.shape = &box;
+	fixture.density = 1.0f;
+	fixture.isSensor = true;
+
+	b->CreateFixture(&fixture);
+
+	PhysBody* pbody = new PhysBody();
+	pbody->body = b;
+	b->SetUserData(pbody);
+	pbody->width = width;
+	pbody->height = height;
+
+	return pbody;
+}
+
 
 PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size)
 {
@@ -229,6 +265,50 @@ update_status ModulePhysics::PostUpdate()
 				}
 				break;
 			}
+
+			if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
+			{
+				p = { PIXEL_TO_METERS(App->input->GetMouseX()), PIXEL_TO_METERS(App->input->GetMouseY()) };
+				if (f->GetShape()->TestPoint(b->GetTransform(), p) == true)
+				{
+					mouseBody = b;
+
+					b2Vec2 mousePosition;
+					mousePosition.x = p.x;
+					mousePosition.y = p.y;
+
+					b2MouseJointDef def;
+					def.bodyA = ground;
+					def.bodyB = mouseBody;
+					def.target = mousePosition;
+					def.dampingRatio = 0.5f;
+					def.frequencyHz = 2.0f;
+					def.maxForce = 100.0f * mouseBody->GetMass();
+
+					mouse_joint = (b2MouseJoint*)world->CreateJoint(&def);
+				}
+			}
+		}
+	}
+
+	if (mouseBody != nullptr)
+	{
+		if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT)
+		{
+			b2Vec2 mousePosition;
+			mousePosition.x = PIXEL_TO_METERS(App->input->GetMouseX());
+			mousePosition.y = PIXEL_TO_METERS(App->input->GetMouseY());
+			mouse_joint->SetTarget(mousePosition);
+
+			App->renderer->DrawLine(METERS_TO_PIXELS(mouseBody->GetPosition().x), METERS_TO_PIXELS(mouseBody->GetPosition().y), App->input->GetMouseX(), App->input->GetMouseY(), 255, 0, 0);
+		}
+
+		// TODO 4: If the player releases the mouse button, destroy the joint
+		if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_UP)
+		{
+			world->DestroyJoint(mouse_joint);
+			mouse_joint = nullptr;
+			mouseBody = nullptr;
 		}
 	}
 
@@ -278,18 +358,29 @@ int PhysBody::RayCast(int x1, int y1, int x2, int y2, float& normal_x, float& no
 	int ret = -1;
 
 	b2RayCastOutput output;
-	output.fraction = 1;
+	output.fraction = 1.0f;
 	output.normal.Set(0, 0);
+
 	b2RayCastInput input;
-	input.maxFraction = 1;
-	input.p1.Set(x1, y1);
-	input.p2.Set(x2, y2);
-	body->GetFixtureList()->RayCast(&output, input, 0);
-	if (output.fraction < 1) {
-		normal_x = output.normal.x;
-		normal_y = output.normal.y;
-		b2Vec2 intersection = input.p1 + output.fraction * (input.p2 - input.p1);
-		ret = sqrt(intersection.x * intersection.x + intersection.y * intersection.y);
+	input.maxFraction = 1.0f;
+	input.p1.Set(PIXEL_TO_METERS(x1), PIXEL_TO_METERS(y1));
+	input.p2.Set(PIXEL_TO_METERS(x2), PIXEL_TO_METERS(y2));
+
+	const b2Fixture* fixture = body->GetFixtureList();
+
+	while (fixture != NULL)
+	{
+		if(fixture->GetShape()->RayCast(&output, input, body->GetTransform(), 0) == true)
+		{
+			float fx = x2 - x1;
+			float fy = y2 - y1;
+			float dist = sqrtf((fx * fx) + (fy * fy));
+
+			normal_x = output.normal.x;
+			normal_y = output.normal.y;
+
+			return output.fraction * dist;
+		}
 	}
 
 	return ret;
@@ -307,5 +398,3 @@ void ModulePhysics::BeginContact(b2Contact* contact) {
 		physB->listener->OnCollision(physA, physB);
 	}
 }
-
-// TODO 7: Call the listeners that are not NULL

@@ -10,6 +10,7 @@ ModuleInput::ModuleInput(Application* app, bool start_enabled) : Module(app, sta
 {
 	keyboard = new KEY_STATE[MAX_KEYS];
 	memset(keyboard, KEY_IDLE, sizeof(KEY_STATE) * MAX_KEYS);
+	memset(mouse_buttons, KEY_IDLE, sizeof(KEY_STATE) * MAX_MOUSE_BUTTONS);
 }
 
 // Destructor
@@ -59,12 +60,30 @@ update_status ModuleInput::PreUpdate()
 		}
 	}
 
-	if(keyboard[SDL_SCANCODE_ESCAPE] == KEY_UP)
-		return UPDATE_STOP;
-
-	SDL_GetMouseState(&mouse_x, &mouse_y);
+	Uint32 buttons = SDL_GetMouseState(&mouse_x, &mouse_y);
 	mouse_x /= SCREEN_SIZE;
 	mouse_y /= SCREEN_SIZE;
+
+	for (int i = 0; i < MAX_MOUSE_BUTTONS; ++i)
+	{
+		if (buttons & SDL_BUTTON(i))
+		{
+			if (mouse_buttons[i] == KEY_IDLE)
+				mouse_buttons[i] = KEY_DOWN;
+			else
+				mouse_buttons[i] = KEY_REPEAT;
+		}
+		else
+		{
+			if (mouse_buttons[i] == KEY_REPEAT || mouse_buttons[i] == KEY_DOWN)
+				mouse_buttons[i] = KEY_UP;
+			else
+				mouse_buttons[i] = KEY_IDLE;
+		}
+	}
+
+	if(keyboard[SDL_SCANCODE_ESCAPE] == KEY_UP)
+		return UPDATE_STOP;
 
 	return UPDATE_CONTINUE;
 }
