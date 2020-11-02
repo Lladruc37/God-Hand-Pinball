@@ -391,10 +391,10 @@ void ModulePhysics::BeginContact(b2Contact* contact) {
 	LOG("Collision!");
 	PhysBody* physA = (PhysBody*)contact->GetFixtureA()->GetBody()->GetUserData();
 	PhysBody* physB = (PhysBody*)contact->GetFixtureB()->GetBody()->GetUserData();
-	if (physA != nullptr) {
+	if (physA && physA->listener != NULL) {
 		physA->listener->OnCollision(physA, physB);
 	}
-	if (physB != nullptr) {
+	if (physB && physB->listener != NULL) {
 		physB->listener->OnCollision(physA, physB);
 	}
 }
