@@ -19,5 +19,5 @@ public:
 	p2List<PhysBody*> circles;
 	SDL_Texture* circleText;
 	SDL_Rect circleSect = { 127,317,19,21 };
-	uint bonus_fx;
+	uint click_fx;
 };

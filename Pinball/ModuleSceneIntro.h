@@ -24,7 +24,6 @@ public:
 	bool sensed;
 
 	SDL_Texture* background;
-	uint bonus_fx;
 	p2Point<int> ray;
 	bool ray_on;
 

@@ -20,7 +20,7 @@ bool ModulePlayer::Start()
 	LOG("Loading player");
 
 	circleText = App->textures->Load("pinball/GameElements.png");
-	bonus_fx = App->audio->LoadFx("pinball/bonus.wav");
+	click_fx = App->audio->LoadFx("pinball/audio/fx/click.wav");
 
 	return true;
 }
@@ -57,5 +57,5 @@ update_status ModulePlayer::Update()
 
 void ModulePlayer::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 {
-	App->audio->PlayFx(bonus_fx);
+	App->audio->PlayFx(click_fx);
 }

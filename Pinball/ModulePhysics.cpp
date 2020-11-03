@@ -29,7 +29,6 @@ bool ModulePhysics::Start()
 	LOG("Creating Physics 2D environment");
 
 	world = new b2World(b2Vec2(GRAVITY_X, -GRAVITY_Y));
-	// TODO 3: You need to make ModulePhysics class a contact listener
 	world->SetContactListener(this);
 
 	// needed to create joints like mouse joint
@@ -285,7 +284,6 @@ update_status ModulePhysics::PostUpdate()
 			App->renderer->DrawLine(METERS_TO_PIXELS(mouseBody->GetPosition().x), METERS_TO_PIXELS(mouseBody->GetPosition().y), App->input->GetMouseX(), App->input->GetMouseY(), 255, 0, 0);
 		}
 
-		// TODO 4: If the player releases the mouse button, destroy the joint
 		if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_UP)
 		{
 			world->DestroyJoint(mouse_joint);
@@ -323,8 +321,6 @@ float PhysBody::GetRotation() const
 
 bool PhysBody::Contains(int x, int y) const
 {
-	// TODO 1: Write the code to return true in case the point
-	// is inside ANY of the shapes contained by this body
 	b2Vec2 p;
 	p.Set(PIXEL_TO_METERS(x), PIXEL_TO_METERS(y));
 	if (body->GetFixtureList()->GetShape()->TestPoint(body->GetTransform(), p)) {
@@ -335,8 +331,6 @@ bool PhysBody::Contains(int x, int y) const
 
 int PhysBody::RayCast(int x1, int y1, int x2, int y2, float& normal_x, float& normal_y) const
 {
-	// TODO 2: Write code to test a ray cast between both points provided. If not hit return -1
-	// if hit, fill normal_x and normal_y and return the distance between x1,y1 and it's colliding point
 	int ret = -1;
 
 	b2RayCastOutput output;
@@ -368,7 +362,6 @@ int PhysBody::RayCast(int x1, int y1, int x2, int y2, float& normal_x, float& no
 	return ret;
 }
 
-// TODO 3
 void ModulePhysics::BeginContact(b2Contact* contact) {
 	LOG("Collision!");
 	PhysBody* physA = (PhysBody*)contact->GetFixtureA()->GetBody()->GetUserData();
