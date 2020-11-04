@@ -5,6 +5,7 @@
 #include "ModuleInput.h"
 #include "ModuleTextures.h"
 #include "ModuleAudio.h"
+#include "ModuleFonts.h"
 #include "ModulePhysics.h"
 
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
@@ -25,11 +26,12 @@ bool ModuleSceneIntro::Start()
 	App->renderer->camera.x = App->renderer->camera.y = 0;
 
 	background = App->textures->Load("pinball/Background.png");
+	font = App->fonts->Load("pinball/nesfont.png", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{:}~ª", 6);
 
 	//sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
 
 	backgrounds.add(App->physics->CreateChain(0, 0, backgroundChain, 90, b2_staticBody));
-	backgrounds.add(App->physics->CreateChain(0, 0, TopLeftBlue, 22, b2_staticBody));
+	backgrounds.add(App->physics->CreateChain(0, 0, TopLeftBlue, 30, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, TopLeftSmol, 8, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, TopRightSmol, 8, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, TopRightBig, 72, b2_staticBody));
@@ -86,6 +88,10 @@ update_status ModuleSceneIntro::Update()
 	// -------------------------------------------------------------------------
 	SDL_Rect sect = { 350, 0, 336, 954 };
 	App->renderer->Blit(background, 0, 0, true, &sect);
+
+	sprintf_s(test, 16, "You're a qt uwu");
+	App->fonts->BlitText(32, 32, font, test);
+
 
 	// ray -----------------
 	if(ray_on == true)

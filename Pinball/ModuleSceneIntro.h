@@ -3,13 +3,14 @@
 #include "p2List.h"
 #include "p2Point.h"
 #include "Globals.h"
+#include "Animation.h"
 
 class PhysBody;
 
 class ModuleSceneIntro : public Module
 {
 public:
-	ModuleSceneIntro(Application* app, bool start_enabled = true);
+	ModuleSceneIntro(Application* app, bool start_enabled = false);
 	~ModuleSceneIntro();
 
 	bool Start();
@@ -27,6 +28,7 @@ public:
 	p2Point<int> ray;
 	bool ray_on;
 
+	// Chain Fun
 	int backgroundChain[90] = {
 		296, 861,
 		203, 954,
@@ -74,18 +76,22 @@ public:
 		267, 714,
 		296, 743
 	};
-	int TopLeftBlue[22] = {
-		76, 87,
-		104, 115,
-		104, 142,
+	int TopLeftBlue[30] = {
+		104, 141,
 		70, 175,
-		70, 200,
+		70, 199,
 		66, 206,
 		60, 206,
-		51, 188,
-		42, 164,
-		42, 127,
-		54, 103
+		52, 193,
+		46, 177,
+		42, 163,
+		42, 126,
+		48, 112,
+		53, 103,
+		60, 95,
+		66, 90,
+		75, 86,
+		104, 115
 	};
 	int TopLeftSmol[8] = {
 		136, 114,
@@ -234,4 +240,8 @@ public:
 		254, 831,
 		265, 817
 	};
+
+	// Font stuff
+	int font = -1;
+	char test[16] = { "\0" };
 };

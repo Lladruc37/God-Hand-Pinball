@@ -5,9 +5,13 @@
 #include "ModuleTextures.h"
 #include "ModuleInput.h"
 #include "ModuleAudio.h"
+#include "ModuleFonts.h"
+#include "ModuleTransition.h"
+
 #include "ModulePlayer.h"
 #include "ModulePhysics.h"
 #include "ModuleSceneIntro.h"
+#include "ModuleTitleScreen.h"
 
 #include "Application.h"
 
@@ -18,8 +22,11 @@ Application::Application()
 	textures = new ModuleTextures(this);
 	input = new ModuleInput(this);
 	audio = new ModuleAudio(this, true);
+	fonts = new ModuleFonts(this);
 	player = new ModulePlayer(this);
 	scene_intro = new ModuleSceneIntro(this);
+	title_screen = new ModuleTitleScreen(this);
+	transition = new ModuleTransition(this);
 	physics = new ModulePhysics(this);
 
 	// The order of calls is very important!
@@ -36,10 +43,15 @@ Application::Application()
 	AddModule(physics);
 
 	// Scenes
+	AddModule(title_screen);
 	AddModule(scene_intro);
 	
 	// Player
 	AddModule(player);
+
+	//Other
+	AddModule(fonts);
+	AddModule(transition);
 
 	// Render
 	AddModule(renderer);
