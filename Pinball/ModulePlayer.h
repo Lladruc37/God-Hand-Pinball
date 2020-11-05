@@ -8,7 +8,7 @@ struct Handle
 {
 	PhysBody* Rect;
 	PhysBody* Circle;
-	bool invert;
+	bool rightSide;
 };
 
 class ModulePlayer : public Module

@@ -27,32 +27,32 @@ bool ModulePlayer::Start()
 	b2Vec2 b = { 0, 0 };
 
 	Handle* h = new Handle;
-	h->Circle = App->physics->CreateCircle(82, 868, 10, b2_staticBody);
-	h->Rect = App->physics->CreateRectangle(72 + rectSect.w / 2, 858 + rectSect.h / 2, rectSect.w, rectSect.h, b2_dynamicBody);
-	h->invert = false;
+	h->Circle = App->physics->CreateCircle(82, 868, 4, b2_staticBody);
+	h->Rect = App->physics->CreateRectangle(72 + rectSect.w / 2, 858 + rectSect.h / 2, rectSect.w, rectSect.h - 10, b2_dynamicBody);
+	h->rightSide = false;
 	handle = handles.add(h);
 	App->physics->CreateRevoluteJoint(handle->data->Rect, a, handle->data->Circle, b, 35.0f);
 
 	Handle* h2 = new Handle;
-	h2->Circle = App->physics->CreateCircle(82, 410, 10, b2_staticBody);
-	h2->Rect = App->physics->CreateRectangle(72 + rectSect.w / 2, 400 + rectSect.h / 2, rectSect.w, rectSect.h, b2_dynamicBody);
-	h2->invert = false;
+	h2->Circle = App->physics->CreateCircle(82, 410, 4, b2_staticBody);
+	h2->Rect = App->physics->CreateRectangle(72 + rectSect.w / 2, 400 + rectSect.h / 2, rectSect.w, rectSect.h - 10, b2_dynamicBody);
+	h2->rightSide = false;
 	handle = handles.add(h2);
 	App->physics->CreateRevoluteJoint(handle->data->Rect, a, handle->data->Circle, b, 35.0f);
 
 	a = { 0.44,0 };
 
 	Handle* h3 = new Handle;
-	h3->Circle = App->physics->CreateCircle(226, 868, 10, b2_staticBody);
-	h3->Rect = App->physics->CreateRectangle(216 - rectSect.w / 2, 858 + rectSect.h / 2, rectSect.w, rectSect.h, b2_dynamicBody);
-	h3->invert = true;
+	h3->Circle = App->physics->CreateCircle(226, 868, 4, b2_staticBody);
+	h3->Rect = App->physics->CreateRectangle(216 - rectSect.w / 2, 858 + rectSect.h / 2, rectSect.w, rectSect.h - 10, b2_dynamicBody);
+	h3->rightSide = true;
 	handle = handles.add(h3);
 	App->physics->CreateRevoluteJoint(handle->data->Rect, a, handle->data->Circle, b, 35.0f);
 
 	Handle* h4 = new Handle;
-	h4->Circle = App->physics->CreateCircle(223, 410, 10, b2_staticBody);
-	h4->Rect = App->physics->CreateRectangle(213 - rectSect.w / 2, 400 + rectSect.h / 2, rectSect.w, rectSect.h, b2_dynamicBody);
-	h4->invert = true;
+	h4->Circle = App->physics->CreateCircle(223, 410, 4, b2_staticBody);
+	h4->Rect = App->physics->CreateRectangle(213 - rectSect.w / 2, 400 + rectSect.h / 2, rectSect.w, rectSect.h - 10, b2_dynamicBody);
+	h4->rightSide = true;
 	handle = handles.add(h4);
 	App->physics->CreateRevoluteJoint(handle->data->Rect, a, handle->data->Circle, b, 35.0f);
 
@@ -76,6 +76,19 @@ update_status ModulePlayer::Update()
 		circles.getLast()->data->listener = this;
 	}
 
+
+	if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_DOWN)
+	{
+		p2List_item<Handle*>* h = handles.getFirst();
+		while (h != NULL)
+		{
+			if (h->data->rightSide == false)
+			{
+			}
+			h = h->next;
+		}
+	}
+
 	// Blits
 	p2List_item<PhysBody*>* c = circles.getFirst();
 	while (c != NULL)
@@ -91,7 +104,7 @@ update_status ModulePlayer::Update()
 	{
 		int x, y;
 		h->data->Rect->GetPosition(x, y);
-		App->renderer->Blit(playerText, x, y, false, &rectSect, h->data->invert, 1.0f, h->data->Rect->GetRotation());
+		App->renderer->Blit(playerText, x, y - 5, false, &rectSect, h->data->rightSide, 1.0f, h->data->Rect->GetRotation());
 		h = h->next;
 	}
 	return UPDATE_CONTINUE;
