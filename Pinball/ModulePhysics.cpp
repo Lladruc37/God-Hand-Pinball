@@ -168,7 +168,7 @@ PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size, b2Body
 	return pbody;
 }
 
-b2RevoluteJoint* ModulePhysics::CreateRevoluteJoint(PhysBody* A, b2Vec2 anchorA, PhysBody* B, b2Vec2 anchorB, bool collideConnected, bool enableLimit, float angle)
+b2RevoluteJoint* ModulePhysics::CreateRevoluteJoint(PhysBody* A, b2Vec2 anchorA, PhysBody* B, b2Vec2 anchorB, float angle, bool collideConnected, bool enableLimit)
 {
 	b2RevoluteJointDef revoluteJointDef;
 	revoluteJointDef.bodyA = A->body;

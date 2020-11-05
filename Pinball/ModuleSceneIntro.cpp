@@ -6,6 +6,7 @@
 #include "ModuleTextures.h"
 #include "ModuleAudio.h"
 #include "ModuleFonts.h"
+#include "ModulePlayer.h"
 #include "ModulePhysics.h"
 
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
@@ -22,6 +23,9 @@ bool ModuleSceneIntro::Start()
 {
 	LOG("Loading Intro assets");
 	bool ret = true;
+
+	App->physics->Enable();
+	App->player->Enable();
 
 	App->renderer->camera.x = App->renderer->camera.y = 0;
 

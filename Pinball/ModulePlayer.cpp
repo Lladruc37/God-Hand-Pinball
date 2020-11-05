@@ -22,11 +22,21 @@ bool ModulePlayer::Start()
 	playerText = App->textures->Load("pinball/GameElements.png");
 	click_fx = App->audio->LoadFx("pinball/audio/fx/click.wav");
 
-	handlesRects.add(App->physics->CreateRectangle(0, 0, rectSect.w, rectSect.h, b2_dynamicBody));
-	handlesCircles.add(App->physics->CreateCircle(0, 0, 10, b2_dynamicBody));
-	b2Vec2 a = { -22, 0 };
+	p2List_item<PhysBody*>* bodyB;
+	p2List_item<PhysBody*>* bodyA;
+	b2Vec2 a = { -0.44, 0 };
 	b2Vec2 b = { 0, 0 };
-	//App->physics->CreateRevoluteJoint();
+
+	bodyB = handlesCircles.add(App->physics->CreateCircle(82, 868, 10, b2_staticBody));
+	bodyA = handlesRects.add(App->physics->CreateRectangle(72 + rectSect.w/2, 858 + rectSect.h/2, rectSect.w, rectSect.h, b2_dynamicBody));
+	App->physics->CreateRevoluteJoint(bodyA->data, a, bodyB->data, b, 35.0f);
+
+	bodyB = handlesCircles.add(App->physics->CreateCircle(82, 410, 10, b2_staticBody));
+	bodyA = handlesRects.add(App->physics->CreateRectangle(72 + rectSect.w / 2, 400 + rectSect.h / 2, rectSect.w, rectSect.h, b2_dynamicBody));
+	App->physics->CreateRevoluteJoint(bodyA->data, a, bodyB->data, b, 35.0f);
+
+	a = { 0.44,0 };
+
 	return true;
 }
 

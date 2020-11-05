@@ -38,7 +38,7 @@ public:
 class ModulePhysics : public Module, public b2ContactListener
 {
 public:
-	ModulePhysics(Application* app, bool start_enabled = true);
+	ModulePhysics(Application* app, bool start_enabled = false);
 	~ModulePhysics();
 
 	bool Start();
@@ -50,7 +50,7 @@ public:
 	PhysBody* CreateRectangle(int x, int y, int width, int height, b2BodyType type = b2_dynamicBody);
 	PhysBody* CreateRectangleSensor(int x, int y, int width, int height, b2BodyType type = b2_dynamicBody);
 	PhysBody* CreateChain(int x, int y, int* points, int size, b2BodyType type = b2_dynamicBody);
-	b2RevoluteJoint* CreateRevoluteJoint(PhysBody* A, b2Vec2 anchorA, PhysBody* B, b2Vec2 anchorB, bool collideConnected = false, bool enableLimit = true, float angle = 0.0f);
+	b2RevoluteJoint* CreateRevoluteJoint(PhysBody* A, b2Vec2 anchorA, PhysBody* B, b2Vec2 anchorB, float angle = 0.0f, bool collideConnected = false, bool enableLimit = true);
 
 	void BeginContact(b2Contact* contact) override;
 
