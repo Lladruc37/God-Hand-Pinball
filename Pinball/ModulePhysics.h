@@ -8,9 +8,13 @@
 
 #define PIXELS_PER_METER 50.0f // if touched change METER_PER_PIXEL too
 #define METER_PER_PIXEL 0.02f // this is 1 / PIXELS_PER_METER !
+#define RAD_PER_DEG ((float)180/b2_pi)
+#define DEG_PER_RAD ((float)b2_pi/180)
 
 #define METERS_TO_PIXELS(m) ((int) floor(PIXELS_PER_METER * m))
 #define PIXEL_TO_METERS(p)  ((float) METER_PER_PIXEL * p)
+#define RAD_TO_DEG(r) ((float) RAD_PER_DEG * r)
+#define DEG_TO_RAD(r) ((float) DEG_PER_RAD * r)
 
 // Small class to return to other modules to track position and rotation of physics bodies
 class PhysBody
@@ -46,6 +50,7 @@ public:
 	PhysBody* CreateRectangle(int x, int y, int width, int height, b2BodyType type = b2_dynamicBody);
 	PhysBody* CreateRectangleSensor(int x, int y, int width, int height, b2BodyType type = b2_dynamicBody);
 	PhysBody* CreateChain(int x, int y, int* points, int size, b2BodyType type = b2_dynamicBody);
+	b2RevoluteJoint* CreateRevoluteJoint(PhysBody* A, b2Vec2 anchorA, PhysBody* B, b2Vec2 anchorB, bool collideConnected = false, bool enableLimit = true, float angle = 0.0f);
 
 	void BeginContact(b2Contact* contact) override;
 
@@ -58,4 +63,6 @@ private:
 	b2MouseJoint* mouse_joint;
 	b2Body* mouseBody;
 	b2Vec2 p;
+
+	p2List<b2RevoluteJoint*> revoluteList;
 };

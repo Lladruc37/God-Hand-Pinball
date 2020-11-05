@@ -19,9 +19,14 @@ bool ModulePlayer::Start()
 {
 	LOG("Loading player");
 
-	circleText = App->textures->Load("pinball/GameElements.png");
+	playerText = App->textures->Load("pinball/GameElements.png");
 	click_fx = App->audio->LoadFx("pinball/audio/fx/click.wav");
 
+	handlesRects.add(App->physics->CreateRectangle(0, 0, rectSect.w, rectSect.h, b2_dynamicBody));
+	handlesCircles.add(App->physics->CreateCircle(0, 0, 10, b2_dynamicBody));
+	b2Vec2 a = { -22, 0 };
+	b2Vec2 b = { 0, 0 };
+	//App->physics->CreateRevoluteJoint();
 	return true;
 }
 
@@ -44,13 +49,21 @@ update_status ModulePlayer::Update()
 
 	// Blits
 	p2List_item<PhysBody*>* c = circles.getFirst();
-
 	while (c != NULL)
 	{
 		int x, y;
 		c->data->GetPosition(x, y);
-			App->renderer->Blit(circleText, x, y, false, &circleSect, false, 1.0f, c->data->GetRotation());
+		App->renderer->Blit(playerText, x, y, false, &circleSect, false, 1.0f, c->data->GetRotation());
 		c = c->next;
+	}
+
+	p2List_item<PhysBody*>* h = handlesRects.getFirst();
+	while (h != NULL)
+	{
+		int x, y;
+		h->data->GetPosition(x, y);
+		App->renderer->Blit(playerText, x, y, false, &rectSect, false, 1.0f, h->data->GetRotation());
+		h = h->next;
 	}
 	return UPDATE_CONTINUE;
 }

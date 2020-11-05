@@ -16,8 +16,14 @@ public:
 	void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
 
 public:
+	SDL_Texture* playerText;
+
 	p2List<PhysBody*> circles;
-	SDL_Texture* circleText;
-	SDL_Rect circleSect = { 127,317,19,21 };
+	SDL_Rect circleSect = { 127, 317, 19, 21 };
+
+	p2List<PhysBody*> handlesRects;
+	p2List<PhysBody*> handlesCircles;
+	SDL_Rect rectSect = { 48, 250, 64, 20 };
+
 	uint click_fx;
 };
