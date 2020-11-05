@@ -22,7 +22,6 @@ bool ModulePlayer::Start()
 	playerText = App->textures->Load("pinball/GameElements.png");
 	click_fx = App->audio->LoadFx("pinball/audio/fx/click.wav");
 
-	p2List_item<Handle*>* handle;
 	b2Vec2 a = { -0.44, 0 };
 	b2Vec2 b = { 0, 0 };
 
@@ -30,15 +29,15 @@ bool ModulePlayer::Start()
 	h->Circle = App->physics->CreateCircle(82, 868, 4, b2_staticBody);
 	h->Rect = App->physics->CreateRectangle(72 + rectSect.w / 2, 858 + rectSect.h / 2, rectSect.w, rectSect.h - 10, b2_dynamicBody);
 	h->rightSide = false;
-	handle = handles.add(h);
-	App->physics->CreateRevoluteJoint(handle->data->Rect, a, handle->data->Circle, b, 35.0f);
+	App->physics->CreateRevoluteJoint(h->Rect, a, h->Circle, b, 35.0f);
+	handles.add(h);
 
 	Handle* h2 = new Handle;
 	h2->Circle = App->physics->CreateCircle(82, 410, 4, b2_staticBody);
 	h2->Rect = App->physics->CreateRectangle(72 + rectSect.w / 2, 400 + rectSect.h / 2, rectSect.w, rectSect.h - 10, b2_dynamicBody);
 	h2->rightSide = false;
-	handle = handles.add(h2);
-	App->physics->CreateRevoluteJoint(handle->data->Rect, a, handle->data->Circle, b, 35.0f);
+	App->physics->CreateRevoluteJoint(h2->Rect, a, h2->Circle, b, 35.0f);
+	handles.add(h2);
 
 	a = { 0.44,0 };
 
@@ -46,15 +45,15 @@ bool ModulePlayer::Start()
 	h3->Circle = App->physics->CreateCircle(226, 868, 4, b2_staticBody);
 	h3->Rect = App->physics->CreateRectangle(216 - rectSect.w / 2, 858 + rectSect.h / 2, rectSect.w, rectSect.h - 10, b2_dynamicBody);
 	h3->rightSide = true;
-	handle = handles.add(h3);
-	App->physics->CreateRevoluteJoint(handle->data->Rect, a, handle->data->Circle, b, 35.0f);
+	App->physics->CreateRevoluteJoint(h3->Rect, a, h3->Circle, b, 35.0f);
+	handles.add(h3);
 
 	Handle* h4 = new Handle;
 	h4->Circle = App->physics->CreateCircle(223, 410, 4, b2_staticBody);
 	h4->Rect = App->physics->CreateRectangle(213 - rectSect.w / 2, 400 + rectSect.h / 2, rectSect.w, rectSect.h - 10, b2_dynamicBody);
 	h4->rightSide = true;
-	handle = handles.add(h4);
-	App->physics->CreateRevoluteJoint(handle->data->Rect, a, handle->data->Circle, b, 35.0f);
+	App->physics->CreateRevoluteJoint(h4->Rect, a, h4->Circle, b, 35.0f);
+	handles.add(h4);
 
 	return true;
 }
@@ -77,13 +76,26 @@ update_status ModulePlayer::Update()
 	}
 
 
-	if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_DOWN)
+	if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT)
 	{
 		p2List_item<Handle*>* h = handles.getFirst();
 		while (h != NULL)
 		{
 			if (h->data->rightSide == false)
 			{
+				h->data->Rect->body->ApplyForce({-4,0}, {0,0}, true);
+			}
+			h = h->next;
+		}
+	}
+	if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT)
+	{
+		p2List_item<Handle*>* h = handles.getFirst();
+		while (h != NULL)
+		{
+			if (h->data->rightSide == true)
+			{
+				h->data->Rect->body->ApplyForce({ 4,0 }, { 0,0 }, true);
 			}
 			h = h->next;
 		}
