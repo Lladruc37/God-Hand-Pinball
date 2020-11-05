@@ -4,6 +4,13 @@
 #include "Globals.h"
 #include "p2Point.h"
 
+struct Handle
+{
+	PhysBody* Rect;
+	PhysBody* Circle;
+	bool isLeft;
+};
+
 class ModulePlayer : public Module
 {
 public:
@@ -21,8 +28,7 @@ public:
 	p2List<PhysBody*> circles;
 	SDL_Rect circleSect = { 127, 317, 19, 21 };
 
-	p2List<PhysBody*> handlesRects;
-	p2List<PhysBody*> handlesCircles;
+	p2List<Handle*> handles;
 	SDL_Rect rectSect = { 48, 250, 64, 20 };
 
 	uint click_fx;
