@@ -20,7 +20,7 @@ bool ModulePlayer::Start()
 	LOG("Loading player");
 
 	playerText = App->textures->Load("pinball/GameElements.png");
-	click_fx = App->audio->LoadFx("pinball/audio/fx/click.wav");
+	click_fx = App->audio->LoadFx("pinball/audio/fx/BallCollision.wav");
 
 	b2Vec2 a = { -0.44, 0 };
 	b2Vec2 b = { 0, 0 };

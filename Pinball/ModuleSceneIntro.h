@@ -7,6 +7,11 @@
 
 class PhysBody;
 
+struct Bumper {
+	PhysBody* bumpy;
+	Animation animation;
+};
+
 class ModuleSceneIntro : public Module
 {
 public:
@@ -14,12 +19,14 @@ public:
 	~ModuleSceneIntro();
 
 	bool Start();
+	update_status PreUpdate();
 	update_status Update();
 	bool CleanUp();
 	void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
 
 public:
 	p2List<PhysBody*> backgrounds;
+	p2List<Bumper*> bumpers;
 
 	PhysBody* sensor;
 	bool sensed;
@@ -69,54 +76,6 @@ public:
 	0, 0,
 	336, 0
 	};
-		/*[90] = {
-		296, 861,
-		203, 954,
-		336, 954,
-		336, 0,
-		0, 0,
-		0, 954,
-		101, 954,
-		6, 859,
-		6, 745,
-		37, 714,
-		22, 699,
-		22, 569,
-		6, 520,
-		6, 351,
-		38, 319,
-		38, 254,
-		8, 164,
-		9, 128,
-		13, 114,
-		18, 101,
-		25, 88,
-		32, 78,
-		40, 69,
-		49, 62,
-		61, 56,
-		72, 50,
-		79, 48,
-		256, 48,
-		265, 51,
-		277, 56,
-		284, 60,
-		294, 67,
-		301, 74,
-		308, 84,
-		317, 98,
-		322, 110,
-		326, 121,
-		330, 131,
-		330, 794,
-		300, 794,
-		300, 634,
-		282, 634,
-		282, 699,
-		267, 714,
-		296, 743
-	};*/
-
 	int TopLeftBlue[30] = {
 		104, 141,
 		70, 175,
@@ -281,6 +240,9 @@ public:
 		254, 831,
 		265, 817
 	};
+
+	// Fx stuff
+	uint bumperFx;
 
 	// Font stuff
 	int font = -1;
