@@ -61,6 +61,7 @@ bool ModuleSceneIntro::Start()
 
 	Bumper* b = new Bumper;
 	b->bumpy = App->physics->CreateCircle(152, 198, 20, b2_staticBody);
+	b->bumpy->body->GetFixtureList()->SetRestitution(1.1f);
 	b->bumpy->listener = this;
 	b->animation.PushBack({ 12,76,44,48 });
 	b->animation.PushBack({ 60,76,44,48 });
@@ -68,6 +69,7 @@ bool ModuleSceneIntro::Start()
 
 	Bumper* b2 = new Bumper;
 	b2->bumpy = App->physics->CreateCircle(104, 640, 20, b2_staticBody);
+	b2->bumpy->body->GetFixtureList()->SetRestitution(1.1f);
 	b2->bumpy->listener = this;
 	b2->animation.PushBack({ 12,76,44,48 });
 	b2->animation.PushBack({ 60,76,44,48 });
@@ -75,6 +77,7 @@ bool ModuleSceneIntro::Start()
 
 	Bumper* b3 = new Bumper;
 	b3->bumpy = App->physics->CreateCircle(152, 704, 20, b2_staticBody);
+	b3->bumpy->body->GetFixtureList()->SetRestitution(1.1f);
 	b3->bumpy->listener = this;
 	b3->animation.PushBack({ 110,78,44,48 });
 	b3->animation.PushBack({ 158,78,44,48 });
@@ -82,6 +85,7 @@ bool ModuleSceneIntro::Start()
 
 	Bumper* b4 = new Bumper;
 	b4->bumpy = App->physics->CreateCircle(200, 640, 20, b2_staticBody);
+	b4->bumpy->body->GetFixtureList()->SetRestitution(1.1f);
 	b4->bumpy->listener = this;
 	b4->animation.PushBack({ 12,76,44,48 });
 	b4->animation.PushBack({ 60,76,44,48 });
@@ -175,14 +179,14 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		if (bodyA == b->data->bumpy && bodyB->listener == (Module*)App->player)
 		{
 			App->audio->PlayFx(bumperFx);
-			// 1
-			b2Vec2 body;
-			body.x = METERS_TO_PIXELS(bodyA->body->GetPosition().x - bodyB->body->GetPosition().x);
-			body.y = METERS_TO_PIXELS(bodyA->body->GetPosition().y - bodyB->body->GetPosition().y);
-			// 2
-			b2Vec2 forceDirection = bodyB->body->GetWorldVector(b2Vec2(0, 1));
-			forceDirection = 1.0f * forceDirection;
-			bodyB->body->ApplyForce(forceDirection,bodyB->body->GetPosition(), true);
+			//// 1
+			//b2Vec2 body;
+			//body.x = METERS_TO_PIXELS(bodyA->body->GetPosition().x - bodyB->body->GetPosition().x);
+			//body.y = METERS_TO_PIXELS(bodyA->body->GetPosition().y - bodyB->body->GetPosition().y);
+			//// 2
+			//b2Vec2 forceDirection = bodyB->body->GetWorldVector(b2Vec2(0, 1));
+			//forceDirection = 1.0f * forceDirection;
+			//bodyB->body->ApplyForce(forceDirection,bodyB->body->GetPosition(), true);
 			b->data->animation.Update();
 		}
 		b = b->next;
