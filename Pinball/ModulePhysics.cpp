@@ -195,7 +195,7 @@ b2PrismaticJoint* ModulePhysics::CreatePrismaticJoint(PhysBody* A, b2Vec2 anchor
 	prismaticJointDef.localAnchorB.Set(anchorB.x, anchorB.y);
 	prismaticJointDef.referenceAngle = 0;
 	prismaticJointDef.enableLimit = enableLimit;
-	prismaticJointDef.lowerTranslation = 0;
+	prismaticJointDef.lowerTranslation = -0.01;
 	prismaticJointDef.upperTranslation = maxHeight;
 
 	return (b2PrismaticJoint*)world->CreateJoint(&prismaticJointDef);

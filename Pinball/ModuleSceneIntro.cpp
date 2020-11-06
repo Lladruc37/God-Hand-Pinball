@@ -34,6 +34,7 @@ bool ModuleSceneIntro::Start()
 
 	//sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
 
+	//BACKGROUND -------------------------------------------------------------------------------------
 	backgrounds.add(App->physics->CreateChain(0, 0, backgroundChain, 76, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, TopLeftBlue, 30, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, TopLeftSmol, 8, b2_staticBody));
@@ -92,6 +93,10 @@ update_status ModuleSceneIntro::Update()
 	// -------------------------------------------------------------------------
 	SDL_Rect sect = { 350, 0, 336, 954 };
 	App->renderer->Blit(background, 0, 0, true, &sect);
+
+	int x, y;
+	App->player->kicker.mobile->GetPosition(x, y);
+	App->renderer->Blit(background, x, y - 88, false, &App->player->kickerSect);
 
 	sprintf_s(test, 16, "You're a qt uwu");
 	App->fonts->BlitText(32, 32, font, test);

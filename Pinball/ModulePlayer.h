@@ -11,6 +11,12 @@ struct Handle
 	bool rightSide;
 };
 
+struct Kicker
+{
+	PhysBody* pivot;
+	PhysBody* mobile;
+};
+
 class ModulePlayer : public Module
 {
 public:
@@ -30,6 +36,9 @@ public:
 
 	p2List<Handle*> handles;
 	SDL_Rect rectSect = { 48, 250, 64, 20 };
+
+	Kicker kicker;
+	SDL_Rect kickerSect = { 302,706,22,96 };
 
 	uint click_fx;
 };

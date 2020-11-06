@@ -25,6 +25,7 @@ bool ModulePlayer::Start()
 	b2Vec2 a = { -0.44, 0 };
 	b2Vec2 b = { 0, 0 };
 
+	// HANDLES --------------------------------------------------------------
 	Handle* h = new Handle;
 	h->Circle = App->physics->CreateCircle(82, 868, 4, b2_staticBody);
 	h->Rect = App->physics->CreateRectangle(72 + rectSect.w / 2, 858 + rectSect.h / 2, rectSect.w, rectSect.h - 10, b2_dynamicBody);
@@ -55,6 +56,11 @@ bool ModulePlayer::Start()
 	App->physics->CreateRevoluteJoint(h4->Rect, a, h4->Circle, b, 35.0f);
 	handles.add(h4);
 
+	//KICKER -----------------------------------------------------------------------------------------
+	kicker.pivot = App->physics->CreateRectangle(313, 894, 20, 8, b2_staticBody);
+	kicker.mobile = App->physics->CreateRectangle(304, 794, 22, 8, b2_dynamicBody);
+	App->physics->CreatePrismaticJoint(kicker.mobile, { 0,0 }, kicker.pivot, { 0,0 }, { 0,1 }, 1.9f);
+
 	return true;
 }
 
@@ -75,7 +81,7 @@ update_status ModulePlayer::Update()
 		circles.getLast()->data->listener = this;
 	}
 
-
+	// HANDLE CONTROL
 	if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT)
 	{
 		p2List_item<Handle*>* h = handles.getFirst();
@@ -101,6 +107,17 @@ update_status ModulePlayer::Update()
 		}
 	}
 
+	//KICKER CONTROL
+	kicker.mobile->body->ApplyForce({ 0,-18 }, { 0,0 }, true);
+	if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT)
+	{
+		kicker.mobile->body->ApplyForce({ 0,18 }, { 0,0 }, true);
+	}
+	else if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_UP)
+	{
+		kicker.mobile->body->ApplyForce({ 0,-150 }, { 0,0 }, true);
+	}
+
 	// Blits
 	p2List_item<PhysBody*>* c = circles.getFirst();
 	while (c != NULL)
@@ -119,6 +136,9 @@ update_status ModulePlayer::Update()
 		App->renderer->Blit(playerText, x, y - 5, false, &rectSect, h->data->rightSide, 1.0f, h->data->Rect->GetRotation());
 		h = h->next;
 	}
+
+
+
 	return UPDATE_CONTINUE;
 }
 
