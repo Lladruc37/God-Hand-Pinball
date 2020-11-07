@@ -25,7 +25,7 @@ bool ModuleTitleScreen::Start()
     LOG("Loading background assets");
 
     backgroundTexture = App->textures->Load("pinball/titleScreen.png");
-    //App->audio->PlayMusic("pinball/audio/music/TitleScreen.ogg",0);
+    App->audio->PlayMusic("pinball/audio/music/TitleScreen.ogg",0);
 
     return true;
 }

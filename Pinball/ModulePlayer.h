@@ -4,7 +4,7 @@
 #include "Globals.h"
 #include "p2Point.h"
 
-struct Handle
+struct Flipper
 {
 	PhysBody* Rect;
 	PhysBody* Circle;
@@ -33,12 +33,18 @@ public:
 
 	p2List<PhysBody*> circles;
 	SDL_Rect circleSect = { 127, 317, 19, 21 };
+	int ballCount = 2;
 
-	p2List<Handle*> handles;
+	p2List<Flipper*> flippers;
 	SDL_Rect rectSect = { 48, 250, 64, 20 };
 
 	Kicker kicker;
 	SDL_Rect kickerSect = { 302,706,22,96 };
 
-	uint click_fx;
+	uint clickFx;
+	uint kickerFx;
+
+	int currentScore = 0;
+	int previousScore;
+	int highScore = 0;
 };

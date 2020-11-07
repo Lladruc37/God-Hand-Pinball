@@ -27,8 +27,9 @@ public:
 public:
 	p2List<PhysBody*> backgrounds;
 	p2List<Bumper*> bumpers;
+	int bumperTimer = 0;
 
-	PhysBody* sensor;
+	PhysBody* deathSensor;
 	bool sensed;
 
 	SDL_Texture* background;
@@ -243,8 +244,23 @@ public:
 
 	// Fx stuff
 	uint bumperFx;
+	uint fallFx;
 
 	// Font stuff
 	int font = -1;
+	int fontSize = 12;
 	char test[16] = { "\0" };
+
+	char currentScore[6] = { "\0" };
+	char currentScoreNum[12] = { "\0" };
+
+	char highScore[8] = { "\0" };
+	char highScoreNum[12] = { "\0" };
+
+	char prevScore[8] = { "\0" };
+	char prevScoreNum[12] = { "\0" };
+
+	char balls[6] = { "\0" };
+	char ballsNum[2] = { "\0" };
+
 };

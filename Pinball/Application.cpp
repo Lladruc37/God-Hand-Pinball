@@ -39,12 +39,12 @@ Application::Application()
 	AddModule(textures);
 	AddModule(audio);
 
-	// Physics
-	AddModule(physics);
-
 	// Scenes
 	AddModule(title_screen);
 	AddModule(scene_intro);
+
+	// Physics
+	AddModule(physics);
 	
 	// Player
 	AddModule(player);

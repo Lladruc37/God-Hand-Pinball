@@ -4,6 +4,7 @@
 #include "ModuleSceneIntro.h"
 #include "ModuleInput.h"
 #include "ModuleTextures.h"
+#include "ModuleTransition.h"
 #include "ModuleAudio.h"
 #include "ModuleFonts.h"
 #include "ModulePlayer.h"
@@ -31,9 +32,12 @@ bool ModuleSceneIntro::Start()
 
 	background = App->textures->Load("pinball/Background.png");
 	font = App->fonts->Load("pinball/nesfont.png", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{:}~ª", 6);
+	
 	bumperFx = App->audio->LoadFx("pinball/audio/fx/Bumper.wav");
+	fallFx = App->audio->LoadFx("pinball/audio/fx/PeachFall.wav");
 
-	//sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
+	deathSensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 10, b2_staticBody);
+	deathSensor->listener = this;
 
 	//BACKGROUND -------------------------------------------------------------------------------------
 	backgrounds.add(App->physics->CreateChain(0, 0, backgroundChain, 76, b2_staticBody));
@@ -59,37 +63,36 @@ bool ModuleSceneIntro::Start()
 	backgrounds.add(App->physics->CreateChain(0, 0, TopLeftSmol, 8, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, TopLeftSmol, 8, b2_staticBody));
 
+	bumperTimer = 0;
 	Bumper* b = new Bumper;
 	b->bumpy = App->physics->CreateCircle(152, 198, 20, b2_staticBody);
-	b->bumpy->body->GetFixtureList()->SetRestitution(1.1f);
 	b->bumpy->listener = this;
 	b->animation.PushBack({ 12,76,44,48 });
-	b->animation.PushBack({ 60,76,44,48 });
+	b->animation.PushBack({ 60,74,44,48 });
 	bumpers.add(b);
 
 	Bumper* b2 = new Bumper;
 	b2->bumpy = App->physics->CreateCircle(104, 640, 20, b2_staticBody);
-	b2->bumpy->body->GetFixtureList()->SetRestitution(1.1f);
 	b2->bumpy->listener = this;
 	b2->animation.PushBack({ 12,76,44,48 });
-	b2->animation.PushBack({ 60,76,44,48 });
+	b2->animation.PushBack({ 60,74,44,48 });
 	bumpers.add(b2);
 
 	Bumper* b3 = new Bumper;
 	b3->bumpy = App->physics->CreateCircle(152, 704, 20, b2_staticBody);
-	b3->bumpy->body->GetFixtureList()->SetRestitution(1.1f);
 	b3->bumpy->listener = this;
 	b3->animation.PushBack({ 110,78,44,48 });
-	b3->animation.PushBack({ 158,78,44,48 });
+	b3->animation.PushBack({ 158,74,44,48 });
 	bumpers.add(b3);
 
 	Bumper* b4 = new Bumper;
 	b4->bumpy = App->physics->CreateCircle(200, 640, 20, b2_staticBody);
-	b4->bumpy->body->GetFixtureList()->SetRestitution(1.1f);
 	b4->bumpy->listener = this;
 	b4->animation.PushBack({ 12,76,44,48 });
 	b4->animation.PushBack({ 60,76,44,48 });
 	bumpers.add(b4);
+
+	App->audio->PlayMusic("pinball/audio/music/silence.ogg", 1.0f);
 
 	return ret;
 }
@@ -98,6 +101,11 @@ bool ModuleSceneIntro::Start()
 bool ModuleSceneIntro::CleanUp()
 {
 	LOG("Unloading Intro scene");
+	App->player->Disable();
+	App->physics->Disable();
+
+	App->textures->Unload(background);
+	App->fonts->Unload(font);
 
 	return true;
 }
@@ -106,9 +114,26 @@ update_status ModuleSceneIntro::PreUpdate() {
 	p2List_item<Bumper*>* bumperAnimations = bumpers.getFirst();
 	while (bumperAnimations != NULL)
 	{
-		bumperAnimations->data->animation.Reset();
+		if (bumperAnimations->data->animation.currentFrame == 1)
+		{
+			if (bumperTimer == 5)
+			{
+				bumperTimer = 0;
+				bumperAnimations->data->animation.Reset();
+			}
+			else
+			{
+				bumperTimer++;
+			}
+		}
 		bumperAnimations = bumperAnimations->next;
 	}
+
+	if (App->input->GetKey(SDL_SCANCODE_F10) == KEY_DOWN)
+	{
+		App->transition->Transition(this, (Module*)App->title_screen);
+	}
+
 	return UPDATE_CONTINUE;
 }
 
@@ -150,9 +175,26 @@ update_status ModuleSceneIntro::Update()
 		b = b->next;
 	}
 
-	sprintf_s(test, 16, "You're a qt uwu");
-	App->fonts->BlitText(32, 32, font, test);
+	// Text UI ----------------
+	sprintf_s(prevScore, 8, "P-SCORE");
+	App->fonts->BlitText(fontSize * 2, fontSize * 1, font, prevScore);
+	sprintf_s(prevScoreNum, 12, "%6d", App->player->previousScore);
+	App->fonts->BlitText(fontSize * 2.5, fontSize * 2, font, prevScoreNum);
 
+	sprintf_s(currentScore, 6, "SCORE");
+	App->fonts->BlitText(fontSize * 11, fontSize * 1, font, currentScore);
+	sprintf_s(currentScoreNum, 12, "%6d", App->player->currentScore);
+	App->fonts->BlitText(fontSize * 10.5, fontSize * 2, font, currentScoreNum);
+
+	sprintf_s(highScore, 8, "H-SCORE");
+	App->fonts->BlitText(fontSize * 18, fontSize * 1, font, highScore);
+	sprintf_s(highScoreNum, 12, "%6d", App->player->highScore);
+	App->fonts->BlitText(fontSize * 18.5, fontSize * 2, font, highScoreNum);
+
+	sprintf_s(balls, 6, "BALLS");
+	App->fonts->BlitText(fontSize * 19.5, fontSize * 77, font, balls);
+	sprintf_s(ballsNum, 2, "%1d", App->player->ballCount);
+	App->fonts->BlitText(fontSize * 21.5, fontSize * 78, font, ballsNum);
 
 	// ray -----------------
 	if(ray_on == true)
@@ -167,6 +209,10 @@ update_status ModuleSceneIntro::Update()
 			App->renderer->DrawLine(ray.x + destination.x, ray.y + destination.y, ray.x + destination.x + normal.x * 25.0f, ray.y + destination.y + normal.y * 25.0f, 100, 255, 100);
 	}
 
+	/*if (App->player->ballCount < 0)
+	{
+		transition to game over screen
+	}*/
 	return UPDATE_CONTINUE;
 }
 
@@ -179,16 +225,22 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		if (bodyA == b->data->bumpy && bodyB->listener == (Module*)App->player)
 		{
 			App->audio->PlayFx(bumperFx);
-			//// 1
-			//b2Vec2 body;
-			//body.x = METERS_TO_PIXELS(bodyA->body->GetPosition().x - bodyB->body->GetPosition().x);
-			//body.y = METERS_TO_PIXELS(bodyA->body->GetPosition().y - bodyB->body->GetPosition().y);
-			//// 2
-			//b2Vec2 forceDirection = bodyB->body->GetWorldVector(b2Vec2(0, 1));
-			//forceDirection = 1.0f * forceDirection;
-			//bodyB->body->ApplyForce(forceDirection,bodyB->body->GetPosition(), true);
+			b2Vec2 force(bodyB->body->GetWorldCenter() - bodyA->body->GetWorldCenter());
+			force *= 3;
+			bodyB->body->ApplyLinearImpulse(force, bodyB->body->GetWorldCenter(), true);
 			b->data->animation.Update();
+			App->player->currentScore += 100;
+			return;
 		}
 		b = b->next;
+	}
+
+	if (bodyA == deathSensor && bodyB->listener == (Module*)App->player)
+	{
+		App->player->ballCount--;
+		App->player->circles.add(App->physics->CreateCircle(303, 765, 10));
+		App->player->circles.getLast()->data->listener = (Module*)App->player;
+		App->audio->PlayFx(fallFx);
+		return;
 	}
 }
