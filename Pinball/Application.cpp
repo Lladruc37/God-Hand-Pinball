@@ -12,6 +12,7 @@
 #include "ModulePhysics.h"
 #include "ModuleSceneIntro.h"
 #include "ModuleTitleScreen.h"
+#include "ModuleGameOver.h"
 
 #include "Application.h"
 
@@ -26,6 +27,7 @@ Application::Application()
 	player = new ModulePlayer(this);
 	scene_intro = new ModuleSceneIntro(this);
 	title_screen = new ModuleTitleScreen(this);
+	game_over = new ModuleGameOver(this);
 	transition = new ModuleTransition(this);
 	physics = new ModulePhysics(this);
 
@@ -42,6 +44,7 @@ Application::Application()
 	// Scenes
 	AddModule(title_screen);
 	AddModule(scene_intro);
+	AddModule(game_over);
 
 	// Physics
 	AddModule(physics);

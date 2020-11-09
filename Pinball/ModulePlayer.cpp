@@ -72,8 +72,8 @@ bool ModulePlayer::Start()
 	App->physics->CreatePrismaticJoint(kicker.mobile, { 0,0 }, kicker.pivot, { 0,0 }, { 0,1 }, 1.9f);
 
 	//Ball -------------------------------------------------------------------------------------------
-	circles.add(App->physics->CreateCircle(303, 765, 10));
-	circles.getLast()->data->listener = this;
+	onceInit = true; // Change whenever
+	isDead = false;
 
 	return true;
 }
@@ -91,6 +91,13 @@ bool ModulePlayer::CleanUp()
 // Update: draw background
 update_status ModulePlayer::Update()
 {
+	if (onceInit)
+	{
+		circles.add(App->physics->CreateCircle(303, 765, 10));
+		circles.getLast()->data->listener = this;
+		onceInit = false;
+	}
+
 	if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
 	{
 		circles.add(App->physics->CreateCircle(App->input->GetMouseX(), App->input->GetMouseY(), 10));
@@ -105,7 +112,7 @@ update_status ModulePlayer::Update()
 		{
 			if (f->data->rightSide == false)
 			{
-				f->data->Rect->body->ApplyForce({-3,0}, {0,0}, true);
+				f->data->Rect->body->ApplyForce({ -3,0 }, { 0,0 }, true);
 			}
 			f = f->next;
 		}
@@ -133,6 +140,23 @@ update_status ModulePlayer::Update()
 	{
 		kicker.mobile->body->ApplyForce({ 0,-150 }, { 0,0 }, true);
 		App->audio->PlayFx(kickerFx);
+	}
+
+	// Game Overs ----------------------------------------------------
+	if (isDead)
+	{
+		isDead = false;
+		p2List_item<PhysBody*>* c = circles.getFirst();
+		while (c != NULL)
+		{
+			c->data->body->GetWorld()->DestroyBody(c->data->body);
+			c = c->next;
+		}
+		circles.clear();
+
+		ballCount--;
+		circles.add(App->physics->CreateCircle(303, 765, 10));
+		circles.getLast()->data->listener = (Module*)App->player;
 	}
 
 	// Blits ---------------------------------------------------------

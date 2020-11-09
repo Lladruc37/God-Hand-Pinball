@@ -13,6 +13,7 @@ class ModuleFonts;
 class ModulePlayer;
 class ModuleTitleScreen;
 class ModuleSceneIntro;
+class ModuleGameOver;
 class ModuleTransition;
 class ModulePhysics;
 
@@ -28,6 +29,7 @@ public:
 	ModulePlayer* player;
 	ModuleTitleScreen* title_screen;
 	ModuleSceneIntro* scene_intro;
+	ModuleGameOver* game_over;
 	ModuleTransition* transition;
 	ModulePhysics* physics;
 

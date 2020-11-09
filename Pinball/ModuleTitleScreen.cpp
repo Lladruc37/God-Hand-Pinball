@@ -9,7 +9,6 @@
 #include "ModulePlayer.h"
 #include "ModuleTransition.h"
 #include "ModuleSceneIntro.h"
-//#include "ModuleWinScreen.h"
 
 #include "SDL/include/SDL_scancode.h"
 
@@ -32,7 +31,7 @@ bool ModuleTitleScreen::Start()
 
 update_status ModuleTitleScreen::Update()
 {
-    if ((App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_STATE::KEY_DOWN)) {
+    if ((App->input->GetKey(SDL_SCANCODE_RETURN) == KEY_STATE::KEY_DOWN)) {
         App->transition->Transition(this, (Module*)App->scene_intro, 20.0f);
     }
 

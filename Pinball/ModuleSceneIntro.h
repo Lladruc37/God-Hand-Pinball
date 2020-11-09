@@ -249,6 +249,7 @@ public:
 	// Font stuff
 	int font = -1;
 	int fontSize = 12;
+
 	char test[16] = { "\0" };
 
 	char currentScore[6] = { "\0" };

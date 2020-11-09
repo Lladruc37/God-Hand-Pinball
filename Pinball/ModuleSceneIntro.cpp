@@ -9,6 +9,7 @@
 #include "ModuleFonts.h"
 #include "ModulePlayer.h"
 #include "ModulePhysics.h"
+#include "ModuleGameOver.h"
 
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -32,7 +33,7 @@ bool ModuleSceneIntro::Start()
 
 	background = App->textures->Load("pinball/Background.png");
 	font = App->fonts->Load("pinball/nesfont.png", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{:}~ª", 6);
-	
+
 	bumperFx = App->audio->LoadFx("pinball/audio/fx/Bumper.wav");
 	fallFx = App->audio->LoadFx("pinball/audio/fx/PeachFall.wav");
 
@@ -134,13 +135,23 @@ update_status ModuleSceneIntro::PreUpdate() {
 		App->transition->Transition(this, (Module*)App->title_screen);
 	}
 
+	if (App->player->ballCount < 0)
+	{
+		App->transition->Transition(this, (Module*)App->game_over);
+	}
+
 	return UPDATE_CONTINUE;
 }
 
 // Update: draw background
 update_status ModuleSceneIntro::Update()
 {
-	if(App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
+	if (App->player->ballCount < 0)
+	{
+		return UPDATE_CONTINUE;
+	}
+
+	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && App->physics->debug)
 	{
 		ray_on = !ray_on;
 		ray.x = App->input->GetMouseX();
@@ -148,7 +159,7 @@ update_status ModuleSceneIntro::Update()
 	}
 
 	// Prepare for raycast ------------------------------------------------------
-	
+
 	iPoint mouse;
 	mouse.x = App->input->GetMouseX();
 	mouse.y = App->input->GetMouseY();
@@ -159,6 +170,7 @@ update_status ModuleSceneIntro::Update()
 	// -------------------------------------------------------------------------
 	// All draw functions ------------------------------------------------------
 	// -------------------------------------------------------------------------
+
 	SDL_Rect sect = { 350, 0, 336, 954 };
 	App->renderer->Blit(background, 0, 0, true, &sect);
 
@@ -171,7 +183,7 @@ update_status ModuleSceneIntro::Update()
 	{
 		int x, y;
 		b->data->bumpy->GetPosition(x, y);
-		App->renderer->Blit(App->player->playerText, x - 2, y - 4, false, &b->data->animation.GetCurrentFrame() , false, 1.0f, b->data->bumpy->GetRotation());
+		App->renderer->Blit(App->player->playerText, x - 2, y - 4, false, &b->data->animation.GetCurrentFrame(), false, 1.0f, b->data->bumpy->GetRotation());
 		b = b->next;
 	}
 
@@ -197,22 +209,18 @@ update_status ModuleSceneIntro::Update()
 	App->fonts->BlitText(fontSize * 21.5, fontSize * 78, font, ballsNum);
 
 	// ray -----------------
-	if(ray_on == true)
+	if (ray_on == true)
 	{
-		fVector destination(mouse.x-ray.x, mouse.y-ray.y);
+		fVector destination(mouse.x - ray.x, mouse.y - ray.y);
 		destination.Normalize();
 		destination *= ray_hit;
 
 		App->renderer->DrawLine(ray.x, ray.y, ray.x + destination.x, ray.y + destination.y, 255, 255, 255);
 
-		if(normal.x != 0.0f)
+		if (normal.x != 0.0f)
 			App->renderer->DrawLine(ray.x + destination.x, ray.y + destination.y, ray.x + destination.x + normal.x * 25.0f, ray.y + destination.y + normal.y * 25.0f, 100, 255, 100);
 	}
 
-	/*if (App->player->ballCount < 0)
-	{
-		transition to game over screen
-	}*/
 	return UPDATE_CONTINUE;
 }
 
@@ -237,10 +245,8 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 
 	if (bodyA == deathSensor && bodyB->listener == (Module*)App->player)
 	{
-		App->player->ballCount--;
-		App->player->circles.add(App->physics->CreateCircle(303, 765, 10));
-		App->player->circles.getLast()->data->listener = (Module*)App->player;
 		App->audio->PlayFx(fallFx);
+		App->player->isDead = true;
 		return;
 	}
 }

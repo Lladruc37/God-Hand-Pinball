@@ -73,6 +73,7 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="ModuleFonts.h" />
+    <ClInclude Include="ModuleGameOver.h" />
     <ClInclude Include="ModulePhysics.h" />
     <ClInclude Include="ModuleTitleScreen.h" />
     <ClInclude Include="ModuleTransition.h" />
@@ -94,6 +95,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ModuleAudio.cpp" />
     <ClCompile Include="ModuleFonts.cpp" />
+    <ClCompile Include="ModuleGameOver.cpp" />
     <ClCompile Include="ModuleInput.cpp" />
     <ClCompile Include="ModulePhysics.cpp" />
     <ClCompile Include="ModulePlayer.cpp" />

@@ -34,6 +34,8 @@ public:
 	p2List<PhysBody*> circles;
 	SDL_Rect circleSect = { 127, 317, 19, 21 };
 	int ballCount = 2;
+	bool onceInit = true;
+	bool isDead = false;
 
 	p2List<Flipper*> flippers;
 	SDL_Rect rectSect = { 48, 250, 64, 20 };

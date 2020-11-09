@@ -56,9 +56,10 @@ public:
 	
 	void BeginContact(b2Contact* contact) override;
 
+	bool debug;
+
 private:
 
-	bool debug;
 	b2World* world;
 	b2Body* ground;
 
