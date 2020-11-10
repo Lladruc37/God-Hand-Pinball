@@ -12,6 +12,24 @@ struct Bumper {
 	Animation animation;
 };
 
+struct Sensor {
+	enum sensorValue
+	{
+		NONE = -1,
+		DEATH,
+		CARD,
+		EGG,
+		TP,
+		PAC_MAN,
+		HUNDREDS,
+		THOUSAND
+	};
+	PhysBody* sensor;
+	sensorValue value;
+	bool isActive;
+	int sensorTimer = 0;
+};
+
 class ModuleSceneIntro : public Module
 {
 public:
@@ -28,9 +46,14 @@ public:
 	p2List<PhysBody*> backgrounds;
 	p2List<Bumper*> bumpers;
 	int bumperTimer = 0;
-
-	PhysBody* deathSensor;
-	bool sensed;
+	p2List<Sensor*> sensors;
+	SDL_Rect cardSect = { 197,149,26,46 }; // -1, -3
+	SDL_Rect cardSect2 = { 229,149,26,46 };
+	SDL_Rect cardSect3 = { 261,149,26,46 };
+	SDL_Rect cardSect4 = { 307,79,26,46 };
+	SDL_Rect cardSect5 = { 339,79,26,46 };
+	Animation cardAnim;
+	Animation eggAnim;
 
 	SDL_Texture* background;
 	p2Point<int> ray;
