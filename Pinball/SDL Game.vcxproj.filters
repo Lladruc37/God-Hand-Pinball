@@ -56,19 +56,10 @@
     <ClInclude Include="ModulePhysics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleTitleScreen.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ModuleTransition.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Animation.h">
       <Filter>Header Files\Containers</Filter>
     </ClInclude>
     <ClInclude Include="ModuleFonts.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ModuleGameOver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -106,16 +97,7 @@
     <ClCompile Include="ModulePhysics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleTitleScreen.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ModuleTransition.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ModuleFonts.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ModuleGameOver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

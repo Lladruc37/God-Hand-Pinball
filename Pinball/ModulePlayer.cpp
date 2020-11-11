@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ModuleRender.h"
 #include "ModulePlayer.h"
+#include "ModuleSceneIntro.h"
 #include "ModuleInput.h"
 #include "ModuleTextures.h"
 #include "ModuleAudio.h"
@@ -22,15 +23,6 @@ bool ModulePlayer::Start()
 	playerText = App->textures->Load("pinball/GameElements.png");
 	clickFx = App->audio->LoadFx("pinball/audio/fx/BallCollision.wav");
 	kickerFx = App->audio->LoadFx("pinball/audio/fx/Spring.wav");
-
-	previousScore = currentScore;
-	if (currentScore > highScore)
-	{
-		highScore = currentScore;
-	}
-	currentScore = 0;
-
-	ballCount = 2;
 
 	b2Vec2 a = { -0.44, 0 };
 	b2Vec2 b = { 0, 0 };
@@ -72,7 +64,7 @@ bool ModulePlayer::Start()
 	App->physics->CreatePrismaticJoint(kicker.mobile, { 0,0 }, kicker.pivot, { 0,0 }, { 0,1 }, 1.9f);
 
 	//Ball -------------------------------------------------------------------------------------------
-	onceInit = true; // Change whenever
+	onceInit = true;
 	isDead = false;
 
 	return true;
@@ -91,91 +83,110 @@ bool ModulePlayer::CleanUp()
 // Update: draw background
 update_status ModulePlayer::Update()
 {
-	if (onceInit)
+	if (App->scene_intro->currentScene == Scene::PINBALL)
 	{
-		circles.add(App->physics->CreateCircle(303, 765, 10));
-		circles.getLast()->data->listener = this;
-		onceInit = false;
-	}
-
-	if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
-	{
-		circles.add(App->physics->CreateCircle(App->input->GetMouseX(), App->input->GetMouseY(), 10));
-		circles.getLast()->data->listener = this;
-	}
-
-	// Flippers --------------------------------------------------
-	if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT)
-	{
-		p2List_item<Flipper*>* f = flippers.getFirst();
-		while (f != NULL)
+		if (onceInit)
 		{
-			if (f->data->rightSide == false)
-			{
-				f->data->Rect->body->ApplyForce({ -3,0 }, { 0,0 }, true);
-			}
-			f = f->next;
+			circles.add(App->physics->CreateCircle(303, 767, 10));
+			circles.getLast()->data->listener = this;
+			currentScore = 0;
+			onceInit = false;
+			isDead = false;
 		}
-	}
-	if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT)
-	{
-		p2List_item<Flipper*>* f = flippers.getFirst();
-		while (f != NULL)
+
+		if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
 		{
-			if (f->data->rightSide == true)
-			{
-				f->data->Rect->body->ApplyForce({ 3,0 }, { 0,0 }, true);
-			}
-			f = f->next;
+			circles.add(App->physics->CreateCircle(App->input->GetMouseX(), App->input->GetMouseY(), 10));
+			circles.getLast()->data->listener = this;
 		}
-	}
 
-	//Kicker -------------------------------------------------
-	kicker.mobile->body->ApplyForce({ 0,-18 }, { 0,0 }, true);
-	if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT)
-	{
-		kicker.mobile->body->ApplyForce({ 0,18 }, { 0,0 }, true);
-	}
-	else if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_UP)
-	{
-		kicker.mobile->body->ApplyForce({ 0,-150 }, { 0,0 }, true);
-		App->audio->PlayFx(kickerFx);
-	}
+		// Flippers --------------------------------------------------
+		if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT)
+		{
+			p2List_item<Flipper*>* f = flippers.getFirst();
+			while (f != NULL)
+			{
+				if (f->data->rightSide == false)
+				{
+					f->data->Rect->body->ApplyForce({ -3,0 }, { 0,0 }, true);
+				}
+				f = f->next;
+			}
+		}
+		if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT)
+		{
+			p2List_item<Flipper*>* f = flippers.getFirst();
+			while (f != NULL)
+			{
+				if (f->data->rightSide == true)
+				{
+					f->data->Rect->body->ApplyForce({ 3,0 }, { 0,0 }, true);
+				}
+				f = f->next;
+			}
+		}
 
-	// Game Overs ----------------------------------------------------
-	if (isDead)
-	{
-		isDead = false;
+		//Kicker -------------------------------------------------
+		kicker.mobile->body->ApplyForce({ 0,-18 }, { 0,0 }, true);
+		if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT)
+		{
+			kicker.mobile->body->ApplyForce({ 0,18 }, { 0,0 }, true);
+		}
+		else if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_UP)
+		{
+			kicker.mobile->body->ApplyForce({ 0,-150 }, { 0,0 }, true);
+			App->audio->PlayFx(kickerFx);
+		}
+
+		// Game Overs ----------------------------------------------------
+		if (isDead)
+		{
+			isDead = false;
+			p2List_item<PhysBody*>* c = circles.getFirst();
+			while (c != NULL)
+			{
+				c->data->body->GetWorld()->DestroyBody(c->data->body);
+				c = c->next;
+			}
+			circles.clear();
+
+			ballCount--;
+			if (ballCount >= 0)
+			{
+				circles.add(App->physics->CreateCircle(303, 765, 10));
+				circles.getLast()->data->listener = (Module*)App->player;
+			}
+		}
+
+		// Blits ---------------------------------------------------------
 		p2List_item<PhysBody*>* c = circles.getFirst();
 		while (c != NULL)
 		{
-			c->data->body->GetWorld()->DestroyBody(c->data->body);
+			int x, y;
+			c->data->GetPosition(x, y);
+			App->renderer->Blit(playerText, x, y, false, &circleSect, false, 1.0f, c->data->GetRotation());
 			c = c->next;
 		}
-		circles.clear();
 
-		ballCount--;
-		circles.add(App->physics->CreateCircle(303, 765, 10));
-		circles.getLast()->data->listener = (Module*)App->player;
+		p2List_item<Flipper*>* f = flippers.getFirst();
+		while (f != NULL)
+		{
+			int x, y;
+			f->data->Rect->GetPosition(x, y);
+			App->renderer->Blit(playerText, x, y - 5, false, &rectSect, f->data->rightSide, 1.0f, f->data->Rect->GetRotation());
+			f = f->next;
+		}
 	}
-
-	// Blits ---------------------------------------------------------
-	p2List_item<PhysBody*>* c = circles.getFirst();
-	while (c != NULL)
+	else
 	{
-		int x, y;
-		c->data->GetPosition(x, y);
-		App->renderer->Blit(playerText, x, y, false, &circleSect, false, 1.0f, c->data->GetRotation());
-		c = c->next;
-	}
+		previousScore = currentScore;
+		if (currentScore > highScore)
+		{
+			highScore = currentScore;
+		}
 
-	p2List_item<Flipper*>* f = flippers.getFirst();
-	while (f != NULL)
-	{
-		int x, y;
-		f->data->Rect->GetPosition(x, y);
-		App->renderer->Blit(playerText, x, y - 5, false, &rectSect, f->data->rightSide, 1.0f, f->data->Rect->GetRotation());
-		f = f->next;
+		onceInit = true;
+		isDead = false;
 	}
 
 	return UPDATE_CONTINUE;

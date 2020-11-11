@@ -3,6 +3,7 @@
 #include "ModuleInput.h"
 #include "ModuleRender.h"
 #include "ModulePhysics.h"
+#include "ModuleSceneIntro.h"
 #include "p2Point.h"
 #include "math.h"
 
@@ -16,7 +17,7 @@ ModulePhysics::ModulePhysics(Application* app, bool start_enabled) : Module(app,
 {
 	world = NULL;
 	mouse_joint = NULL;
-	debug = true;
+	debug = false;
 }
 
 // Destructor
@@ -204,7 +205,7 @@ b2PrismaticJoint* ModulePhysics::CreatePrismaticJoint(PhysBody* A, b2Vec2 anchor
 // 
 update_status ModulePhysics::PostUpdate()
 {
-	if(App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
+	if(App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN && App->scene_intro->currentScene == Scene::PINBALL)
 		debug = !debug;
 
 	if(!debug)

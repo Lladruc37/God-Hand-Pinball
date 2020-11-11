@@ -38,7 +38,7 @@ public:
 class ModulePhysics : public Module, public b2ContactListener
 {
 public:
-	ModulePhysics(Application* app, bool start_enabled = false);
+	ModulePhysics(Application* app, bool start_enabled = true);
 	~ModulePhysics();
 
 	bool Start();

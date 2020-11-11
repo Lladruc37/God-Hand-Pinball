@@ -4,12 +4,10 @@
 #include "ModuleSceneIntro.h"
 #include "ModuleInput.h"
 #include "ModuleTextures.h"
-#include "ModuleTransition.h"
 #include "ModuleAudio.h"
 #include "ModuleFonts.h"
 #include "ModulePlayer.h"
 #include "ModulePhysics.h"
-#include "ModuleGameOver.h"
 
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -24,10 +22,6 @@ bool ModuleSceneIntro::Start()
 {
 	LOG("Loading Intro assets");
 	bool ret = true;
-
-	App->physics->Enable();
-	App->player->Enable();
-
 	App->renderer->camera.x = App->renderer->camera.y = 0;
 
 	background = App->textures->Load("pinball/Background.png");
@@ -260,7 +254,14 @@ bool ModuleSceneIntro::Start()
 	eggAnim3.PushBack({ 153,7,18,26 });
 	eggAnim3.loop = true;
 
-	App->audio->PlayMusic("pinball/audio/music/silence.ogg", 1.0f);
+	// TITLE SCREEN //
+	currentScene = TITLE_SCREEN;
+	backgroundTexture = App->textures->Load("pinball/titleScreen.png");
+	App->audio->PlayMusic("pinball/audio/music/TitleScreen.ogg", 0);
+	startTitle = false;
+
+	// GAME OVER //
+	gameOverFont = App->fonts->Load("pinball/bignesfont.png", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{:}~ª", 6);
 
 	return ret;
 }
@@ -269,11 +270,15 @@ bool ModuleSceneIntro::Start()
 bool ModuleSceneIntro::CleanUp()
 {
 	LOG("Unloading Intro scene");
-	App->player->Disable();
-	App->physics->Disable();
 
 	App->textures->Unload(background);
 	App->fonts->Unload(font);
+
+	//TITLE SCREEN
+	App->textures->Unload(backgroundTexture);
+
+	//GAME OVER
+	App->fonts->Unload(gameOverFont);
 
 	return true;
 }
@@ -297,14 +302,10 @@ update_status ModuleSceneIntro::PreUpdate() {
 		bumperAnimations = bumperAnimations->next;
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_F10) == KEY_DOWN)
-	{
-		App->transition->Transition(this, (Module*)App->title_screen);
-	}
 
-	if (App->player->ballCount < 0)
+	if (App->player->ballCount < 0 && currentScene != GAME_OVER)
 	{
-		App->transition->Transition(this, (Module*)App->game_over);
+		currentScene = GAME_OVER;
 	}
 
 	return UPDATE_CONTINUE;
@@ -313,131 +314,187 @@ update_status ModuleSceneIntro::PreUpdate() {
 // Update: draw background
 update_status ModuleSceneIntro::Update()
 {
-	if (App->player->ballCount < 0)
+	switch (currentScene)
 	{
-		return UPDATE_CONTINUE;
-	}
-
-	if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && App->physics->debug)
-	{
-		ray_on = !ray_on;
-		ray.x = App->input->GetMouseX();
-		ray.y = App->input->GetMouseY();
-	}
-
-	// Prepare for raycast ------------------------------------------------------
-
-	iPoint mouse;
-	mouse.x = App->input->GetMouseX();
-	mouse.y = App->input->GetMouseY();
-	int ray_hit = ray.DistanceTo(mouse);
-
-	fVector normal(0.0f, 0.0f);
-
-	// -------------------------------------------------------------------------
-	// All draw functions ------------------------------------------------------
-	// -------------------------------------------------------------------------
-
-	SDL_Rect sect = { 350, 0, 336, 954 };
-	App->renderer->Blit(background, 0, 0, true, &sect);
-
-	int x, y;
-	App->player->kicker.mobile->GetPosition(x, y);
-	App->renderer->Blit(background, x, y - 88, false, &App->player->kickerSect);
-
-	p2List_item<Bumper*>* b = bumpers.getFirst();
-	while (b != NULL)
-	{
-		int x, y;
-		b->data->bumpy->GetPosition(x, y);
-		App->renderer->Blit(App->player->playerText, x - 2, y - 4, false, &b->data->animation.GetCurrentFrame(), false, 1.0f, b->data->bumpy->GetRotation());
-		b = b->next;
-	}
-
-	p2List_item<Sensor*>* s = sensors.getFirst();
-	while (s != NULL)
-	{
-		int x, y;
-		s->data->sensor->GetPosition(x, y);
-		switch (s->data->value)
+	case TITLE_SCREEN:
+		if (startTitle)
 		{
-		case Sensor::CARD:
-			if (s->data->isActive == true) {
-				if (x == 77) {
-					App->renderer->Blit(App->player->playerText, x - 2, y - cardSect.h, false, &cardSect, false, 1.0f, s->data->sensor->GetRotation());
-				}
-				else if (x == 109) {
-					App->renderer->Blit(App->player->playerText, x - 2, y - cardSect2.h, false, &cardSect2, false, 1.0f, s->data->sensor->GetRotation());
-				}
-				else if (x == 141) {
-					App->renderer->Blit(App->player->playerText, x - 2, y - cardSect3.h, false, &cardSect3, false, 1.0f, s->data->sensor->GetRotation());
-				}
-				else if (x == 173) {
-					App->renderer->Blit(App->player->playerText, x - 2, y - cardSect4.h, false, &cardSect4, false, 1.0f, s->data->sensor->GetRotation());
-				}
-				else if (x == 205) {
-					App->renderer->Blit(App->player->playerText, x - 2, y - cardSect5.h, false, &cardSect5, false, 1.0f, s->data->sensor->GetRotation());
-				}
-			}
-			break;
-		case Sensor::EGG:
-			if (s->data->isActive == true) {
-				if (x == 101) {
-					App->renderer->Blit(App->player->playerText, x, y, false, &eggAnim.GetCurrentFrame(), false, 1.0f, s->data->sensor->GetRotation());
-				}
-				else if (x == 141) {
-					App->renderer->Blit(App->player->playerText, x, y, false, &eggAnim2.GetCurrentFrame(), false, 1.0f, s->data->sensor->GetRotation());
-				}
-				else if (x == 181) {
-					App->renderer->Blit(App->player->playerText, x, y, false, &eggAnim3.GetCurrentFrame(), false, 1.0f, s->data->sensor->GetRotation());
-				}
-			}
-			break;
-		case Sensor::PAC_MAN:
-			if (s->data->isActive == true)
-			{
-				App->renderer->Blit(App->player->playerText, x + pacSect.w/2 + 1, y + pacSect.h/2, false, &pacSect, false, 1.0f, s->data->sensor->GetRotation());
-			}
-			break;
-		default:
-			break;
+			startTitle = false;
+			App->audio->PlayMusic("pinball/audio/music/TitleScreen.ogg", 0);
 		}
-		s = s->next;
+
+		if (App->input->GetKey(SDL_SCANCODE_RETURN) == KEY_STATE::KEY_DOWN) {
+			currentScene = PINBALL;
+			App->audio->PlayMusic("pinball/audio/music/silence.ogg");
+		}
+
+		App->renderer->Blit(backgroundTexture, 0, 0, true);
+		break;
+
+	case PINBALL:
+		{
+			if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && App->physics->debug)
+			{
+				ray_on = !ray_on;
+				ray.x = App->input->GetMouseX();
+				ray.y = App->input->GetMouseY();
+			}
+
+			// Prepare for raycast ------------------------------------------------------
+
+			iPoint mouse;
+			mouse.x = App->input->GetMouseX();
+			mouse.y = App->input->GetMouseY();
+			int ray_hit = ray.DistanceTo(mouse);
+
+			fVector normal(0.0f, 0.0f);
+
+
+			// -------------------------------------------------------------------------
+			// All draw functions ------------------------------------------------------
+			// -------------------------------------------------------------------------
+
+			SDL_Rect sect = { 350, 0, 336, 954 };
+			App->renderer->Blit(background, 0, 0, true, &sect);
+
+			int x, y;
+			App->player->kicker.mobile->GetPosition(x, y);
+			App->renderer->Blit(background, x, y - 88, false, &App->player->kickerSect);
+
+			p2List_item<Bumper*>* b = bumpers.getFirst();
+			while (b != NULL)
+			{
+				int x, y;
+				b->data->bumpy->GetPosition(x, y);
+				App->renderer->Blit(App->player->playerText, x - 2, y - 4, false, &b->data->animation.GetCurrentFrame(), false, 1.0f, b->data->bumpy->GetRotation());
+				b = b->next;
+			}
+
+			p2List_item<Sensor*>* s = sensors.getFirst();
+			while (s != NULL)
+			{
+				int x, y;
+				s->data->sensor->GetPosition(x, y);
+				switch (s->data->value)
+				{
+				case Sensor::CARD:
+					if (s->data->isActive == true) {
+						if (x == 77) {
+							App->renderer->Blit(App->player->playerText, x - 2, y - cardSect.h, false, &cardSect, false, 1.0f, s->data->sensor->GetRotation());
+						}
+						else if (x == 109) {
+							App->renderer->Blit(App->player->playerText, x - 2, y - cardSect2.h, false, &cardSect2, false, 1.0f, s->data->sensor->GetRotation());
+						}
+						else if (x == 141) {
+							App->renderer->Blit(App->player->playerText, x - 2, y - cardSect3.h, false, &cardSect3, false, 1.0f, s->data->sensor->GetRotation());
+						}
+						else if (x == 173) {
+							App->renderer->Blit(App->player->playerText, x - 2, y - cardSect4.h, false, &cardSect4, false, 1.0f, s->data->sensor->GetRotation());
+						}
+						else if (x == 205) {
+							App->renderer->Blit(App->player->playerText, x - 2, y - cardSect5.h, false, &cardSect5, false, 1.0f, s->data->sensor->GetRotation());
+						}
+					}
+					break;
+				case Sensor::EGG:
+					if (s->data->isActive == true) {
+						if (x == 101) {
+							App->renderer->Blit(App->player->playerText, x, y, false, &eggAnim.GetCurrentFrame(), false, 1.0f, s->data->sensor->GetRotation());
+						}
+						else if (x == 141) {
+							App->renderer->Blit(App->player->playerText, x, y, false, &eggAnim2.GetCurrentFrame(), false, 1.0f, s->data->sensor->GetRotation());
+						}
+						else if (x == 181) {
+							App->renderer->Blit(App->player->playerText, x, y, false, &eggAnim3.GetCurrentFrame(), false, 1.0f, s->data->sensor->GetRotation());
+						}
+					}
+					break;
+				case Sensor::PAC_MAN:
+					if (s->data->isActive == true)
+					{
+						App->renderer->Blit(App->player->playerText, x + pacSect.w / 2 + 1, y + pacSect.h / 2, false, &pacSect, false, 1.0f, s->data->sensor->GetRotation());
+					}
+					break;
+				default:
+					break;
+				}
+				s = s->next;
+			}
+
+			// Text UI ----------------
+			sprintf_s(prevScore, 8, "P-SCORE");
+			App->fonts->BlitText(fontSize * 2, fontSize * 1, font, prevScore);
+			sprintf_s(prevScoreNum, 12, "%6d", App->player->previousScore);
+			App->fonts->BlitText(fontSize * 2.5, fontSize * 2, font, prevScoreNum);
+
+			sprintf_s(currentScore, 6, "SCORE");
+			App->fonts->BlitText(fontSize * 11, fontSize * 1, font, currentScore);
+			sprintf_s(currentScoreNum, 12, "%6d", App->player->currentScore);
+			App->fonts->BlitText(fontSize * 10.5, fontSize * 2, font, currentScoreNum);
+
+			sprintf_s(highScore, 8, "H-SCORE");
+			App->fonts->BlitText(fontSize * 18, fontSize * 1, font, highScore);
+			sprintf_s(highScoreNum, 12, "%6d", App->player->highScore);
+			App->fonts->BlitText(fontSize * 18.5, fontSize * 2, font, highScoreNum);
+
+			sprintf_s(balls, 6, "BALLS");
+			App->fonts->BlitText(fontSize * 19.5, fontSize * 77, font, balls);
+			sprintf_s(ballsNum, 2, "%1d", App->player->ballCount);
+			App->fonts->BlitText(fontSize * 21.5, fontSize * 78, font, ballsNum);
+
+			// ray -----------------
+			if (ray_on == true)
+			{
+				fVector destination(mouse.x - ray.x, mouse.y - ray.y);
+				destination.Normalize();
+				destination *= ray_hit;
+
+				App->renderer->DrawLine(ray.x, ray.y, ray.x + destination.x, ray.y + destination.y, 255, 255, 255);
+
+				if (normal.x != 0.0f)
+					App->renderer->DrawLine(ray.x + destination.x, ray.y + destination.y, ray.x + destination.x + normal.x * 25.0f, ray.y + destination.y + normal.y * 25.0f, 100, 255, 100);
+			}
+		}
+		break;
+
+	case GAME_OVER:
+		App->physics->debug = false;
+		if (App->input->GetKey(SDL_SCANCODE_RETURN) == KEY_STATE::KEY_DOWN)
+		{
+			currentScene = TITLE_SCREEN;
+			bumperTimer = 0;
+			App->player->ballCount = 2;
+			startTitle = true;
+		}
+
+		sprintf_s(gameOverText, 10, "GAME OVER");
+		App->fonts->BlitText(gameOverFontSize * 0.75, gameOverFontSize * 6, gameOverFont, gameOverText);
+
+		sprintf_s(prevScore, 8, "P-SCORE");
+		App->fonts->BlitText(gameOverFontSize * 1.75, gameOverFontSize * 9.5, gameOverFont, prevScore);
+		sprintf_s(prevScoreNum, 12, "%6d", App->player->previousScore);
+		App->fonts->BlitText(gameOverFontSize * 1.75, gameOverFontSize * 10.5, gameOverFont, prevScoreNum);
+
+		sprintf_s(currentScore, 6, "SCORE");
+		App->fonts->BlitText(gameOverFontSize * 1.75, gameOverFontSize * 12.5, gameOverFont, currentScore);
+		sprintf_s(currentScoreNum, 12, "%6d", App->player->currentScore);
+		App->fonts->BlitText(gameOverFontSize * 1.75, gameOverFontSize * 13.5, gameOverFont, currentScoreNum);
+
+		sprintf_s(highScore, 8, "H-SCORE");
+		App->fonts->BlitText(gameOverFontSize * 1.75, gameOverFontSize * 15.5, gameOverFont, highScore);
+		sprintf_s(highScoreNum, 12, "%6d", App->player->highScore);
+		App->fonts->BlitText(gameOverFontSize * 1.75, gameOverFontSize * 16.5, gameOverFont, highScoreNum);
+
+		sprintf_s(spaceToContinue, 28, "- Press enter to continue -");
+		App->fonts->BlitText(gameOverFontSize * 0.20, gameOverFontSize * 19, font, spaceToContinue);
+
+		break;
+
+	default:
+		return UPDATE_ERROR;
+		break;
 	}
-
-	// Text UI ----------------
-	sprintf_s(prevScore, 8, "P-SCORE");
-	App->fonts->BlitText(fontSize * 2, fontSize * 1, font, prevScore);
-	sprintf_s(prevScoreNum, 12, "%6d", App->player->previousScore);
-	App->fonts->BlitText(fontSize * 2.5, fontSize * 2, font, prevScoreNum);
-
-	sprintf_s(currentScore, 6, "SCORE");
-	App->fonts->BlitText(fontSize * 11, fontSize * 1, font, currentScore);
-	sprintf_s(currentScoreNum, 12, "%6d", App->player->currentScore);
-	App->fonts->BlitText(fontSize * 10.5, fontSize * 2, font, currentScoreNum);
-
-	sprintf_s(highScore, 8, "H-SCORE");
-	App->fonts->BlitText(fontSize * 18, fontSize * 1, font, highScore);
-	sprintf_s(highScoreNum, 12, "%6d", App->player->highScore);
-	App->fonts->BlitText(fontSize * 18.5, fontSize * 2, font, highScoreNum);
-
-	sprintf_s(balls, 6, "BALLS");
-	App->fonts->BlitText(fontSize * 19.5, fontSize * 77, font, balls);
-	sprintf_s(ballsNum, 2, "%1d", App->player->ballCount);
-	App->fonts->BlitText(fontSize * 21.5, fontSize * 78, font, ballsNum);
-
-	// ray -----------------
-	if (ray_on == true)
-	{
-		fVector destination(mouse.x - ray.x, mouse.y - ray.y);
-		destination.Normalize();
-		destination *= ray_hit;
-
-		App->renderer->DrawLine(ray.x, ray.y, ray.x + destination.x, ray.y + destination.y, 255, 255, 255);
-
-		if (normal.x != 0.0f)
-			App->renderer->DrawLine(ray.x + destination.x, ray.y + destination.y, ray.x + destination.x + normal.x * 25.0f, ray.y + destination.y + normal.y * 25.0f, 100, 255, 100);
-	}
+	
 
 	return UPDATE_CONTINUE;
 }

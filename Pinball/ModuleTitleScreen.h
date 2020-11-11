@@ -6,7 +6,7 @@ struct SDL_Texture;
 class ModuleTitleScreen : public Module {
 public:
     //Constructor
-    ModuleTitleScreen(Application* app, bool start_enabled = true);
+    ModuleTitleScreen(Application* app, bool start_enabled = false);
 
     //Destructor
     ~ModuleTitleScreen();

@@ -5,6 +5,13 @@
 #include "Globals.h"
 #include "Animation.h"
 
+enum Scene
+{
+	TITLE_SCREEN,
+	PINBALL,
+	GAME_OVER
+};
+
 class PhysBody;
 
 struct Bumper {
@@ -33,7 +40,7 @@ struct Sensor {
 class ModuleSceneIntro : public Module
 {
 public:
-	ModuleSceneIntro(Application* app, bool start_enabled = false);
+	ModuleSceneIntro(Application* app, bool start_enabled = true);
 	~ModuleSceneIntro();
 
 	bool Start();
@@ -291,4 +298,17 @@ public:
 	char balls[6] = { "\0" };
 	char ballsNum[2] = { "\0" };
 
+
+	Scene currentScene;
+
+	// GAME OVER SCREEN //
+	int gameOverFont = -1;
+	int gameOverFontSize = 32;
+
+	char gameOverText[10] = { "\0" };
+	char spaceToContinue[28] = { "\0" };
+
+	// TITLE SCREEN //
+	SDL_Texture* backgroundTexture = nullptr;
+	bool startTitle;
 };
