@@ -35,6 +35,7 @@ bool ModuleSceneIntro::Start()
 
 	bumperFx = App->audio->LoadFx("pinball/audio/fx/Bumper.wav");
 	fallFx = App->audio->LoadFx("pinball/audio/fx/PeachFall.wav");
+	wallPacFx = App->audio->LoadFx("pinball/audio/fx/WallButton_PacMan.wav");
 
 	// Sensors
 	Sensor* deathSensor = new Sensor;
@@ -135,6 +136,62 @@ bool ModuleSceneIntro::Start()
 	holeSensor2->isActive = false;
 	sensors.add(holeSensor2);
 
+	Sensor* pacSensor1 = new Sensor;
+	pacSensor1->sensor = App->physics->CreateRectangleSensor(47, 87, 10, 10, b2_staticBody);
+	pacSensor1->sensor->listener = this;
+	pacSensor1->value = Sensor::PAC_MAN;
+	pacSensor1->isActive = false;
+	sensors.add(pacSensor1);
+
+	Sensor* pacSensor2 = new Sensor;
+	pacSensor2->sensor = App->physics->CreateRectangleSensor(36, 101, 10, 10, b2_staticBody);
+	pacSensor2->sensor->listener = this;
+	pacSensor2->value = Sensor::PAC_MAN;
+	pacSensor2->isActive = false;
+	sensors.add(pacSensor2);
+
+	Sensor* pacSensor3 = new Sensor;
+	pacSensor3->sensor = App->physics->CreateRectangleSensor(28, 117, 10, 10, b2_staticBody);
+	pacSensor3->sensor->listener = this;
+	pacSensor3->value = Sensor::PAC_MAN;
+	pacSensor3->isActive = false;
+	sensors.add(pacSensor3);
+
+	Sensor* pacSensor4 = new Sensor;
+	pacSensor4->sensor = App->physics->CreateRectangleSensor(24, 135, 10, 10, b2_staticBody);
+	pacSensor4->sensor->listener = this;
+	pacSensor4->value = Sensor::PAC_MAN;
+	pacSensor4->isActive = false;
+	sensors.add(pacSensor4);
+
+	Sensor* pacSensor5 = new Sensor;
+	pacSensor5->sensor = App->physics->CreateRectangleSensor(24, 153, 10, 10, b2_staticBody);
+	pacSensor5->sensor->listener = this;
+	pacSensor5->value = Sensor::PAC_MAN;
+	pacSensor5->isActive = false;
+	sensors.add(pacSensor5);
+
+	Sensor* pacSensor6 = new Sensor;
+	pacSensor6->sensor = App->physics->CreateRectangleSensor(26, 171, 10, 10, b2_staticBody);
+	pacSensor6->sensor->listener = this;
+	pacSensor6->value = Sensor::PAC_MAN;
+	pacSensor6->isActive = false;
+	sensors.add(pacSensor6);
+
+	Sensor* pacSensor7 = new Sensor;
+	pacSensor7->sensor = App->physics->CreateRectangleSensor(32, 187, 10, 10, b2_staticBody);
+	pacSensor7->sensor->listener = this;
+	pacSensor7->value = Sensor::PAC_MAN;
+	pacSensor7->isActive = false;
+	sensors.add(pacSensor7);
+
+	Sensor* pacSensor8 = new Sensor;
+	pacSensor8->sensor = App->physics->CreateRectangleSensor(38, 203, 10, 10, b2_staticBody);
+	pacSensor8->sensor->listener = this;
+	pacSensor8->value = Sensor::PAC_MAN;
+	pacSensor8->isActive = false;
+	sensors.add(pacSensor8);
+
 	// BACKGROUND -------------------------------------------------------------------------------------
 	backgrounds.add(App->physics->CreateChain(0, 0, backgroundChain, 76, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, TopLeftBlue, 30, b2_staticBody));
@@ -192,6 +249,16 @@ bool ModuleSceneIntro::Start()
 	eggAnim.PushBack({ 128,7,18,26 });
 	eggAnim.PushBack({ 153,7,18,26 });
 	eggAnim.loop = true;
+
+	eggAnim2.PushBack({ 107,7,18,26 });
+	eggAnim2.PushBack({ 128,7,18,26 });
+	eggAnim2.PushBack({ 153,7,18,26 });
+	eggAnim2.loop = true;
+
+	eggAnim3.PushBack({ 107,7,18,26 });
+	eggAnim3.PushBack({ 128,7,18,26 });
+	eggAnim3.PushBack({ 153,7,18,26 });
+	eggAnim3.loop = true;
 
 	App->audio->PlayMusic("pinball/audio/music/silence.ogg", 1.0f);
 
@@ -314,7 +381,23 @@ update_status ModuleSceneIntro::Update()
 			}
 			break;
 		case Sensor::EGG:
-			App->renderer->Blit(App->player->playerText, x, y, false, &eggAnim.GetCurrentFrame(), false, 1.0f, s->data->sensor->GetRotation());
+			if (s->data->isActive == true) {
+				if (x == 101) {
+					App->renderer->Blit(App->player->playerText, x, y, false, &eggAnim.GetCurrentFrame(), false, 1.0f, s->data->sensor->GetRotation());
+				}
+				else if (x == 141) {
+					App->renderer->Blit(App->player->playerText, x, y, false, &eggAnim2.GetCurrentFrame(), false, 1.0f, s->data->sensor->GetRotation());
+				}
+				else if (x == 181) {
+					App->renderer->Blit(App->player->playerText, x, y, false, &eggAnim3.GetCurrentFrame(), false, 1.0f, s->data->sensor->GetRotation());
+				}
+			}
+			break;
+		case Sensor::PAC_MAN:
+			if (s->data->isActive == true)
+			{
+				App->renderer->Blit(App->player->playerText, x + pacSect.w/2 + 1, y + pacSect.h/2, false, &pacSect, false, 1.0f, s->data->sensor->GetRotation());
+			}
 			break;
 		default:
 			break;
@@ -383,6 +466,8 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	{
 		if (bodyA == s->data->sensor && bodyB->listener == (Module*)App->player)
 		{
+			p2List_item<Sensor*>* pac;
+			int x, y;
 			b2Vec2 originTP;
 			b2Vec2 forceTP;
 			switch (s->data->value)
@@ -390,16 +475,34 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 			case Sensor::DEATH:
 				App->audio->PlayFx(fallFx);
 				App->player->isDead = true;
+				pac = sensors.getFirst();
+				while (pac != NULL)
+				{
+					if (pac->data->value == Sensor::PAC_MAN) {
+						pac->data->isActive = false;
+					}
+					pac = pac->next;
+				}
 				return;
 			case Sensor::CARD:
 				s->data->isActive = true;
 				// should card the card
 				return;
 			case Sensor::EGG:
+				s->data->isActive = true;
 				if (s->data->sensorTimer == 10)
 				{
 					s->data->sensorTimer = 0;
-					eggAnim.Update();
+					s->data->sensor->GetPosition(x,y);
+					if (x == 101) {
+						eggAnim.Update();
+					}
+					else if (x == 141) {
+						eggAnim2.Update();
+					}
+					else if (x == 181) {
+						eggAnim3.Update();
+					}
 				}
 				else
 				{
@@ -440,6 +543,8 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 				// should tp to 280, 360 and force ball to left-top
 				return;
 			case Sensor::PAC_MAN:
+				App->audio->PlayFx(wallPacFx);
+				s->data->isActive = true;
 				// should pac the man
 				return;
 			default:

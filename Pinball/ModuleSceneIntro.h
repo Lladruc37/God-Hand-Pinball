@@ -52,8 +52,11 @@ public:
 	SDL_Rect cardSect3 = { 261,149,26,46 };
 	SDL_Rect cardSect4 = { 307,79,26,46 };
 	SDL_Rect cardSect5 = { 339,79,26,46 };
+	SDL_Rect pacSect = { 40,144,9,11 };
 	Animation cardAnim;
 	Animation eggAnim;
+	Animation eggAnim2;
+	Animation eggAnim3;
 
 	SDL_Texture* background;
 	p2Point<int> ray;
@@ -268,6 +271,7 @@ public:
 	// Fx stuff
 	uint bumperFx;
 	uint fallFx;
+	uint wallPacFx;
 
 	// Font stuff
 	int font = -1;
