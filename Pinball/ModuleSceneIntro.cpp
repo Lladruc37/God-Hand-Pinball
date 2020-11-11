@@ -543,8 +543,11 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 				// should tp to 280, 360 and force ball to left-top
 				return;
 			case Sensor::PAC_MAN:
-				App->audio->PlayFx(wallPacFx);
-				s->data->isActive = true;
+				if (s->data->isActive == false)
+				{
+					App->audio->PlayFx(wallPacFx);
+					s->data->isActive = true;
+				}
 				// should pac the man
 				return;
 			default:
