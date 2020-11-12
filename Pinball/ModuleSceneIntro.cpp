@@ -116,7 +116,7 @@ bool ModuleSceneIntro::Start()
 	eggSensor3->isActive = false;
 	sensors.add(eggSensor3);
 
-	Sensor* holeSensor1 = new Sensor;
+	/*Sensor* holeSensor1 = new Sensor;
 	holeSensor1->sensor = App->physics->CreateRectangleSensor(280, 360, 10, 10, b2_staticBody);
 	holeSensor1->sensor->listener = this;
 	holeSensor1->value = Sensor::TP;
@@ -128,7 +128,7 @@ bool ModuleSceneIntro::Start()
 	holeSensor2->sensor->listener = this;
 	holeSensor2->value = Sensor::TP;
 	holeSensor2->isActive = false;
-	sensors.add(holeSensor2);
+	sensors.add(holeSensor2);*/
 
 	Sensor* pacSensor1 = new Sensor;
 	pacSensor1->sensor = App->physics->CreateRectangleSensor(47, 87, 10, 10, b2_staticBody);
@@ -369,12 +369,14 @@ update_status ModuleSceneIntro::Update()
 					bonusCounter++;
 					if (bonusCounter == 5) {
 						App->renderer->Blit(background, 0, 0, true, &bonusSect);
-						//App->renderer->Blit();
 						if (bonusBool) {
 							bonusBool = false;
 							App->audio->PlayMusic("pinball/audio/music/bonus.ogg", 0.0f, 0);
-							bonusBody = App->physics->CreateCircle(152, 892, 10, b2_staticBody);
+							bonusBody = App->physics->CreateCircle(154, 897, 12, b2_staticBody);
 						}
+						int x, y;
+						bonusBody->GetPosition(x, y);
+						App->renderer->Blit(background, x, y, false, &ballSect);
 					}
 				}
 				bonus = bonus->next;
@@ -546,7 +548,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	{
 		if (bodyA == s->data->sensor && bodyB->listener == (Module*)App->player)
 		{
-			p2List_item<Sensor*>* pac;
+			p2List_item<Sensor*>* reset;
 			int x, y;
 			b2Vec2 originTP;
 			b2Vec2 forceTP;
@@ -555,13 +557,21 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 			case Sensor::DEATH:
 				App->audio->PlayFx(fallFx);
 				App->player->isDead = true;
-				pac = sensors.getFirst();
-				while (pac != NULL)
+				reset = sensors.getFirst();
+				while (reset != NULL)
 				{
-					if (pac->data->value == Sensor::PAC_MAN) {
-						pac->data->isActive = false;
+					if (reset->data->value == Sensor::PAC_MAN) {
+						reset->data->isActive = false;
 					}
-					pac = pac->next;
+					if (reset->data->value == Sensor::CARD) {
+						reset->data->isActive = false;
+					}
+					reset = reset->next;
+				}
+				if (bonusBody != nullptr)
+				{
+					bonusBool = true;
+					bonusBody->pendingToDelete = true;
 				}
 				return;
 			case Sensor::CARD:

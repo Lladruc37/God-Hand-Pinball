@@ -43,6 +43,12 @@ bool ModulePhysics::Start()
 update_status ModulePhysics::PreUpdate()
 {
 	world->Step(1.0f / 60.0f, 6, 2);
+	if (App->scene_intro->bonusBody != nullptr && App->scene_intro->bonusBody->pendingToDelete == true)
+	{
+		App->scene_intro->bonusBody->pendingToDelete = false;
+		delete App->scene_intro->bonusBody;
+		App->scene_intro->bonusBody = nullptr;
+	}
 
 	for (b2Contact* c = world->GetContactList(); c; c = c->GetNext())
 	{

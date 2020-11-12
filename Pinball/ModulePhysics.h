@@ -22,6 +22,10 @@ class PhysBody
 public:
 	PhysBody() : body(NULL), listener(NULL)
 	{}
+	~PhysBody()
+	{
+		body->GetWorld()->DestroyBody(body);
+	}
 
 	void GetPosition(int& x, int &y) const;
 	float GetRotation() const;
@@ -32,6 +36,7 @@ public:
 	int width, height;
 	b2Body* body;
 	Module* listener;
+	bool pendingToDelete = false;
 };
 
 // Module --------------------------------------

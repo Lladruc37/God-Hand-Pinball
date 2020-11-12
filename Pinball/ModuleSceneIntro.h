@@ -315,4 +315,5 @@ public:
 	// BONUS //
 	bool bonusBool;
 	PhysBody* bonusBody = nullptr;
+	SDL_Rect ballSect = { 140,880,24,26 };
 };
