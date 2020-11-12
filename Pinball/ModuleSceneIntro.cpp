@@ -263,6 +263,9 @@ bool ModuleSceneIntro::Start()
 	// GAME OVER //
 	gameOverFont = App->fonts->Load("pinball/bignesfont.png", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{:}~ª", 6);
 
+	// BONUS //
+	bonusBool = true;
+
 	return ret;
 }
 
@@ -320,7 +323,7 @@ update_status ModuleSceneIntro::Update()
 		if (startTitle)
 		{
 			startTitle = false;
-			App->audio->PlayMusic("pinball/audio/music/TitleScreen.ogg", 0);
+			App->audio->PlayMusic("pinball/audio/music/TitleScreen.ogg", 0.0f);
 		}
 
 		if (App->input->GetKey(SDL_SCANCODE_RETURN) == KEY_STATE::KEY_DOWN) {
@@ -356,6 +359,26 @@ update_status ModuleSceneIntro::Update()
 
 			SDL_Rect sect = { 350, 0, 336, 954 };
 			App->renderer->Blit(background, 0, 0, true, &sect);
+
+			int bonusCounter = 0;
+			SDL_Rect bonusSect = { 700,0,336,954 };
+			p2List_item<Sensor*>* bonus = sensors.getFirst();
+			while (bonus != NULL)
+			{
+				if (bonus->data->isActive == true && bonus->data->value == Sensor::CARD) {
+					bonusCounter++;
+					if (bonusCounter == 5) {
+						App->renderer->Blit(background, 0, 0, true, &bonusSect);
+						//App->renderer->Blit();
+						if (bonusBool) {
+							bonusBool = false;
+							App->audio->PlayMusic("pinball/audio/music/bonus.ogg", 0.0f, 0);
+							bonusBody = App->physics->CreateCircle(152, 892, 10, b2_staticBody);
+						}
+					}
+				}
+				bonus = bonus->next;
+			}
 
 			int x, y;
 			App->player->kicker.mobile->GetPosition(x, y);

@@ -311,4 +311,8 @@ public:
 	// TITLE SCREEN //
 	SDL_Texture* backgroundTexture = nullptr;
 	bool startTitle;
+
+	// BONUS //
+	bool bonusBool;
+	PhysBody* bonusBody = nullptr;
 };
