@@ -8,6 +8,7 @@
 #include "ModuleFonts.h"
 #include "ModulePlayer.h"
 #include "ModulePhysics.h"
+#include "time.h"
 
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -30,6 +31,8 @@ bool ModuleSceneIntro::Start()
 	bumperFx = App->audio->LoadFx("pinball/audio/fx/Bumper.wav");
 	fallFx = App->audio->LoadFx("pinball/audio/fx/PeachFall.wav");
 	wallPacFx = App->audio->LoadFx("pinball/audio/fx/WallButton_PacMan.wav");
+	buttonFx = App->audio->LoadFx("pinball/audio/fx/PointButton_SafetyButton.wav");
+	sideBumperFx = App->audio->LoadFx("pinball/audio/fx/SideBumpers.wav");
 
 	// Sensors
 	Sensor* deathSensor = new Sensor;
@@ -186,6 +189,76 @@ bool ModuleSceneIntro::Start()
 	pacSensor8->isActive = false;
 	sensors.add(pacSensor8);
 
+	Sensor* pointButtonSensor = new Sensor;
+	pointButtonSensor->sensor = App->physics->CreateRectangleSensor(90, 166, 16, 16, b2_staticBody);
+	pointButtonSensor->sensor->listener = this;
+	pointButtonSensor->value = Sensor::POINT_BUTTON;
+	pointButtonSensor->isActive = false;
+	sensors.add(pointButtonSensor);
+
+	Sensor* safetyButtonSensor1 = new Sensor;
+	safetyButtonSensor1->sensor = App->physics->CreateRectangleSensor(21, 814, 22, 12, b2_staticBody);
+	safetyButtonSensor1->sensor->listener = this;
+	safetyButtonSensor1->value = Sensor::SAFETY_BUTTON;
+	safetyButtonSensor1->isActive = true;
+	sensors.add(safetyButtonSensor1);
+
+	Sensor* safetyButtonSensor2 = new Sensor;
+	safetyButtonSensor2->sensor = App->physics->CreateRectangleSensor(283, 814, 22, 12, b2_staticBody);
+	safetyButtonSensor2->sensor->listener = this;
+	safetyButtonSensor2->value = Sensor::SAFETY_BUTTON;
+	safetyButtonSensor2->isActive = true;
+	sensors.add(safetyButtonSensor2);
+
+	Sensor* numberButtonSensor = new Sensor;
+	numberButtonSensor->sensor = App->physics->CreateRectangleSensor(28, 592, 4, 14, b2_staticBody);
+	numberButtonSensor->sensor->listener = this;
+	numberButtonSensor->value = Sensor::NUMBER_BUTTON;
+	numberButtonSensor->isActive = true;
+	sensors.add(numberButtonSensor);
+
+	Sensor* numberButtonSensor2 = new Sensor;
+	numberButtonSensor2->sensor = App->physics->CreateRectangleSensor(28, 609, 4, 14, b2_staticBody);
+	numberButtonSensor2->sensor->listener = this;
+	numberButtonSensor2->value = Sensor::NUMBER_BUTTON;
+	numberButtonSensor2->isActive = true;
+	sensors.add(numberButtonSensor2);
+
+	Sensor* numberButtonSensor3 = new Sensor;
+	numberButtonSensor3->sensor = App->physics->CreateRectangleSensor(28, 624, 4, 14, b2_staticBody);
+	numberButtonSensor3->sensor->listener = this;
+	numberButtonSensor3->value = Sensor::NUMBER_BUTTON;
+	numberButtonSensor3->isActive = true;
+	sensors.add(numberButtonSensor3);
+
+	Sensor* numberButtonSensor4 = new Sensor;
+	numberButtonSensor4->sensor = App->physics->CreateRectangleSensor(28, 640, 4, 14, b2_staticBody);
+	numberButtonSensor4->sensor->listener = this;
+	numberButtonSensor4->value = Sensor::NUMBER_BUTTON;
+	numberButtonSensor4->isActive = true;
+	sensors.add(numberButtonSensor4);
+
+	Sensor* numberButtonSensor5 = new Sensor;
+	numberButtonSensor5->sensor = App->physics->CreateRectangleSensor(28, 656, 4, 14, b2_staticBody);
+	numberButtonSensor5->sensor->listener = this;
+	numberButtonSensor5->value = Sensor::NUMBER_BUTTON;
+	numberButtonSensor5->isActive = true;
+	sensors.add(numberButtonSensor5);
+
+	Sensor* numberButtonSensor6 = new Sensor;
+	numberButtonSensor6->sensor = App->physics->CreateRectangleSensor(28, 672, 4, 14, b2_staticBody);
+	numberButtonSensor6->sensor->listener = this;
+	numberButtonSensor6->value = Sensor::NUMBER_BUTTON;
+	numberButtonSensor6->isActive = true;
+	sensors.add(numberButtonSensor6);
+
+	Sensor* numberButtonSensor7 = new Sensor;
+	numberButtonSensor7->sensor = App->physics->CreateRectangleSensor(28, 688, 4, 14, b2_staticBody);
+	numberButtonSensor7->sensor->listener = this;
+	numberButtonSensor7->value = Sensor::NUMBER_BUTTON;
+	numberButtonSensor7->isActive = true;
+	sensors.add(numberButtonSensor7);
+
 	// BACKGROUND -------------------------------------------------------------------------------------
 	backgrounds.add(App->physics->CreateChain(0, 0, backgroundChain, 76, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, TopLeftBlue, 30, b2_staticBody));
@@ -200,8 +273,6 @@ bool ModuleSceneIntro::Start()
 	backgrounds.add(App->physics->CreateChain(0, 0, FourthCardPellet, 8, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, FifthCardPellet, 8, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, SixthCardPellet, 8, b2_staticBody));
-	backgrounds.add(App->physics->CreateChain(0, 0, BottomLeftPink, 12, b2_staticBody));
-	backgrounds.add(App->physics->CreateChain(0, 0, BottomRightPink, 12, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, BottomLeftWhite, 16, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, BottomRightWhite, 16, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, TopLeftSmol, 8, b2_staticBody));
@@ -209,6 +280,11 @@ bool ModuleSceneIntro::Start()
 	backgrounds.add(App->physics->CreateChain(0, 0, TopLeftSmol, 8, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, TopLeftSmol, 8, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, TopLeftSmol, 8, b2_staticBody));
+
+	sideBumpy.add(App->physics->CreateChain(0, 0, BottomLeftPink, 12, b2_staticBody));
+	sideBumpy.getLast()->data->listener = this;
+	sideBumpy.add(App->physics->CreateChain(0, 0, BottomRightPink, 12, b2_staticBody));
+	sideBumpy.getLast()->data->listener = this;
 
 	bumperTimer = 0;
 	Bumper* b = new Bumper;
@@ -254,6 +330,11 @@ bool ModuleSceneIntro::Start()
 	eggAnim3.PushBack({ 153,7,18,26 });
 	eggAnim3.loop = true;
 
+	pointCounter = 100;
+	pacBool = true;
+	cardBool = true;
+	executeOrderSafety = false;
+
 	// TITLE SCREEN //
 	currentScene = TITLE_SCREEN;
 	backgroundTexture = App->textures->Load("pinball/titleScreen.png");
@@ -265,6 +346,11 @@ bool ModuleSceneIntro::Start()
 
 	// BONUS //
 	bonusBool = true;
+
+	// EXIT //
+	exitBool = true;
+	createExit = false;
+	exitBody = App->physics->CreateRectangle(exitRectSect.x + exitRectSect.w * 3 / 2, exitRectSect.y + exitRectSect.h / 2, exitRectSect.w, exitRectSect.h, b2_staticBody);
 
 	return ret;
 }
@@ -360,6 +446,7 @@ update_status ModuleSceneIntro::Update()
 			SDL_Rect sect = { 350, 0, 336, 954 };
 			App->renderer->Blit(background, 0, 0, true, &sect);
 
+			// Bonus counter
 			int bonusCounter = 0;
 			SDL_Rect bonusSect = { 700,0,336,954 };
 			p2List_item<Sensor*>* bonus = sensors.getFirst();
@@ -380,6 +467,57 @@ update_status ModuleSceneIntro::Update()
 					}
 				}
 				bonus = bonus->next;
+			}
+
+			// Exit counter
+			int exitCounter = 0;
+			p2List_item<Sensor*>* exit = sensors.getFirst();
+			while (exit != NULL)
+			{
+				if (exit->data->isActive == false && exit->data->value == Sensor::NUMBER_BUTTON) {
+					exitCounter++;
+					if (exitCounter == 7) {
+						App->renderer->Blit(background, exitRectSect.x + exitRectSect.w, exitRectSect.y, false, &exitRectSect);
+						if (exitBool) {
+							exitBool = false;
+							App->player->currentScore += 1000;
+							exitBody->pendingToDelete = true;
+						}
+						App->renderer->Blit(App->player->playerText, 232, 599, false, &exitSect);
+					}
+				}
+				exit = exit->next;
+			}
+
+			// Pac man counter
+			int pacCounter = 0;
+			p2List_item<Sensor*>* pac = sensors.getFirst();
+			while (pac != NULL)
+			{
+				if (pac->data->isActive == true && pac->data->value == Sensor::PAC_MAN) {
+					pacCounter++;
+					if (pacCounter == 8 && pacBool) {
+						pacBool = false;
+						App->player->currentScore += 2000;
+						pointCounter = 100;
+					}
+				}
+				pac = pac->next;
+			}
+
+			// Card counter
+			int cardCounter = 0;
+			p2List_item<Sensor*>* card = sensors.getFirst();
+			while (card != NULL)
+			{
+				if (card->data->isActive == true && card->data->value == Sensor::CARD) {
+					cardCounter++;
+					if (cardCounter == 5 && cardBool) {
+						cardBool = false;
+						App->player->currentScore += 5000;
+					}
+				}
+				card = card->next;
 			}
 
 			int x, y;
@@ -440,6 +578,40 @@ update_status ModuleSceneIntro::Update()
 						App->renderer->Blit(App->player->playerText, x + pacSect.w / 2 + 1, y + pacSect.h / 2, false, &pacSect, false, 1.0f, s->data->sensor->GetRotation());
 					}
 					break;
+				case Sensor::POINT_BUTTON:
+					App->renderer->Blit(App->player->playerText, x + pointButtonSect.w / 2, y + pointButtonSect.h / 2, false, &pointButtonSect, false, 1.0f, s->data->sensor->GetRotation());
+					break;
+				case Sensor::SAFETY_BUTTON:
+					if (s->data->isActive == true && executeOrderSafety == true)
+					{
+						App->renderer->Blit(App->player->playerText, x + safetyButtonSect.w / 2, y + safetyButtonSect.h / 2, false, &safetyButtonSect, false, 1.0f, s->data->sensor->GetRotation());
+					}
+					break;
+				case Sensor::NUMBER_BUTTON:
+					if (s->data->isActive == true) {
+						if (y == 578) {
+							App->renderer->Blit(App->player->playerText, x + numberButtonSect.w / 2 - 13, y + numberButtonSect.h / 2, false, &numberButtonSect, false, 1.0f, s->data->sensor->GetRotation());
+						}
+						else if (y == 594) {
+							App->renderer->Blit(App->player->playerText, x + numberButtonSect2.w / 2 - 13, y + numberButtonSect2.h / 2, false, &numberButtonSect2, false, 1.0f, s->data->sensor->GetRotation());
+						}
+						else if (y == 610) {
+							App->renderer->Blit(App->player->playerText, x + numberButtonSect3.w / 2 - 13, y + numberButtonSect3.h / 2, false, &numberButtonSect3, false, 1.0f, s->data->sensor->GetRotation());
+						}
+						else if (y == 625) {
+							App->renderer->Blit(App->player->playerText, x + numberButtonSect4.w / 2 - 13, y + numberButtonSect4.h / 2 + 1, false, &numberButtonSect4, false, 1.0f, s->data->sensor->GetRotation());
+						}
+						else if (y == 642) {
+							App->renderer->Blit(App->player->playerText, x + numberButtonSect5.w / 2 - 13, y + numberButtonSect5.h / 2, false, &numberButtonSect5, false, 1.0f, s->data->sensor->GetRotation());
+						}
+						else if (y == 658) {
+							App->renderer->Blit(App->player->playerText, x + numberButtonSect6.w / 2 - 13, y + numberButtonSect6.h / 2, false, &numberButtonSect6, false, 1.0f, s->data->sensor->GetRotation());
+						}
+						else if (y == 673) {
+							App->renderer->Blit(App->player->playerText, x + numberButtonSect7.w / 2 - 13, y + numberButtonSect7.h / 2 + 1, false, &numberButtonSect7, false, 1.0f, s->data->sensor->GetRotation());
+						}
+					}
+					break;
 				default:
 					break;
 				}
@@ -466,6 +638,9 @@ update_status ModuleSceneIntro::Update()
 			App->fonts->BlitText(fontSize * 19.5, fontSize * 77, font, balls);
 			sprintf_s(ballsNum, 2, "%1d", App->player->ballCount);
 			App->fonts->BlitText(fontSize * 21.5, fontSize * 78, font, ballsNum);
+
+			sprintf_s(pointCounterNum, 8, "%4d", pointCounter);
+			App->fonts->BlitText(56 - fontSize/2, 130, font, pointCounterNum);
 
 			// ray -----------------
 			if (ray_on == true)
@@ -512,7 +687,6 @@ update_status ModuleSceneIntro::Update()
 
 		sprintf_s(spaceToContinue, 28, "- Press enter to continue -");
 		App->fonts->BlitText(gameOverFontSize * 0.20, gameOverFontSize * 19, font, spaceToContinue);
-
 		break;
 
 	default:
@@ -526,7 +700,7 @@ update_status ModuleSceneIntro::Update()
 
 void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 {
-	//This will be a fun function in the future :)
+	//This will be a fUN function in the future :)
 	p2List_item<Bumper*>* b = bumpers.getFirst();
 	while (b != NULL)
 	{
@@ -543,6 +717,23 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		b = b->next;
 	}
 
+	srand(time(NULL));
+	int r = (rand() % 100) / 50;
+	if (bodyA == sideBumpy.getFirst()->data && bodyB->listener == (Module*)App->player)
+	{
+		App->audio->PlayFx(sideBumperFx);
+		bodyB->body->ApplyLinearImpulse(b2Vec2(r, -r), bodyB->body->GetWorldCenter(), true);
+		App->player->currentScore += 10;
+		return;
+	}
+	if (bodyA == sideBumpy.getLast()->data && bodyB->listener == (Module*)App->player)
+	{
+		App->audio->PlayFx(sideBumperFx);
+		bodyB->body->ApplyLinearImpulse(b2Vec2(-r, -r), bodyB->body->GetWorldCenter(), true);
+		App->player->currentScore += 10;
+		return;
+	}
+
 	p2List_item<Sensor*>* s = sensors.getFirst();
 	while (s != NULL)
 	{
@@ -557,6 +748,8 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 			case Sensor::DEATH:
 				App->audio->PlayFx(fallFx);
 				App->player->isDead = true;
+				executeOrderSafety = false;
+				pointCounter = 100;
 				reset = sensors.getFirst();
 				while (reset != NULL)
 				{
@@ -566,6 +759,15 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 					if (reset->data->value == Sensor::CARD) {
 						reset->data->isActive = false;
 					}
+					if (reset->data->value == Sensor::EGG) {
+						reset->data->isActive = false;
+					}
+					if (reset->data->value == Sensor::SAFETY_BUTTON) {
+						reset->data->isActive = true;
+					}
+					if (reset->data->value == Sensor::NUMBER_BUTTON) {
+						reset->data->isActive = true;
+					}
 					reset = reset->next;
 				}
 				if (bonusBody != nullptr)
@@ -573,24 +775,35 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 					bonusBool = true;
 					bonusBody->pendingToDelete = true;
 				}
+				if (exitBody == nullptr)
+				{
+					exitBool = true;
+					createExit = true;
+				}
+				// should ded the balls
 				return;
 			case Sensor::CARD:
-				s->data->isActive = true;
+				if (s->data->isActive == false) {
+					s->data->isActive = true;
+					App->player->currentScore += 500;
+				}
 				// should card the card
 				return;
 			case Sensor::EGG:
+			{
+				int eggCounter = 0;
 				s->data->isActive = true;
 				if (s->data->sensorTimer == 10)
 				{
 					s->data->sensorTimer = 0;
-					s->data->sensor->GetPosition(x,y);
+					s->data->sensor->GetPosition(x, y);
 					if (x == 101) {
 						eggAnim.Update();
 					}
-					else if (x == 141) {
+					if (x == 141) {
 						eggAnim2.Update();
 					}
-					else if (x == 181) {
+					if (x == 181) {
 						eggAnim3.Update();
 					}
 				}
@@ -598,8 +811,22 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 				{
 					s->data->sensorTimer++;
 				}
+
+				if ((int)eggAnim.currentFrame == 2) {
+					eggCounter++;
+				}
+				if ((int)eggAnim2.currentFrame == 2) {
+					eggCounter++;
+				}
+				if ((int)eggAnim3.currentFrame == 2) {
+					eggCounter++;
+				}
+				if (eggCounter == 3) {
+					executeOrderSafety = true;
+				}
 				// should egg the eggg
 				return;
+			}
 			case Sensor::HUNDREDS:
 				if (s->data->sensorTimer == 10)
 				{
@@ -610,6 +837,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 				{
 					s->data->sensorTimer++;
 				}
+				// should money your points
 				return;
 			case Sensor::THOUSAND:
 				if (s->data->sensorTimer == 10)
@@ -621,6 +849,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 				{
 					s->data->sensorTimer++;
 				}
+				// should money your points a lot more
 				return;
 			case Sensor::TP:
 				bodyB->body->SetTransform(b2Vec2((float)280, (float)360), 0.0f);
@@ -637,10 +866,48 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 				{
 					App->audio->PlayFx(wallPacFx);
 					s->data->isActive = true;
+					App->player->currentScore += 100;
 				}
 				// should pac the man
 				return;
+			case Sensor::POINT_BUTTON:
+				if (s->data->sensorTimer == 15)
+				{
+					s->data->sensorTimer = 0;
+					App->player->currentScore += pointCounter;
+					App->audio->PlayFx(buttonFx);
+					if (pointCounter < 1000)
+					{
+						pointCounter += 100;
+					}
+				}
+				else
+				{
+					s->data->sensorTimer++;
+				}
+				// should point the button
+				return;
+			case Sensor::SAFETY_BUTTON:
+				if (s->data->isActive == true && executeOrderSafety == true)
+				{
+					b2Vec2 force(bodyB->body->GetWorldCenter() - bodyA->body->GetWorldCenter());
+					force *= 6;
+					bodyB->body->ApplyLinearImpulse(force, bodyB->body->GetWorldCenter(), true);
+					App->audio->PlayFx(buttonFx);
+					s->data->isActive = false;
+				}
+				// should safety the button
+			case Sensor::NUMBER_BUTTON:
+				if (s->data->isActive == true)
+				{
+					App->player->currentScore += 100;
+					App->audio->PlayFx(buttonFx);
+					s->data->isActive = false;
+				}
+				// should number the button
+				return;
 			default:
+				// should never happen
 				return;
 			}
 		}

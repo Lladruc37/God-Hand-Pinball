@@ -126,7 +126,7 @@ update_status ModulePlayer::Update()
 			}
 		}
 
-		//Kicker -------------------------------------------------
+		// Kicker --------------------------------------------------------
 		kicker.mobile->body->ApplyForce({ 0,-18 }, { 0,0 }, true);
 		if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT)
 		{
@@ -136,6 +136,11 @@ update_status ModulePlayer::Update()
 		{
 			kicker.mobile->body->ApplyForce({ 0,-150 }, { 0,0 }, true);
 			App->audio->PlayFx(kickerFx);
+		}
+
+		// Extra ball ----------------------------------------------------
+		if (currentScore % 50000 == 0) {
+			ballCount++;
 		}
 
 		// Game Overs ----------------------------------------------------

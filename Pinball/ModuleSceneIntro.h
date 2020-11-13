@@ -29,7 +29,10 @@ struct Sensor {
 		TP,
 		PAC_MAN,
 		HUNDREDS,
-		THOUSAND
+		THOUSAND,
+		POINT_BUTTON,
+		SAFETY_BUTTON,
+		NUMBER_BUTTON
 	};
 	PhysBody* sensor;
 	sensorValue value;
@@ -53,17 +56,31 @@ public:
 	p2List<PhysBody*> backgrounds;
 	p2List<Bumper*> bumpers;
 	int bumperTimer = 0;
+	p2List<PhysBody*> sideBumpy;
 	p2List<Sensor*> sensors;
-	SDL_Rect cardSect = { 197,149,26,46 }; // -1, -3
+	SDL_Rect cardSect = { 197,149,26,46 };
 	SDL_Rect cardSect2 = { 229,149,26,46 };
 	SDL_Rect cardSect3 = { 261,149,26,46 };
 	SDL_Rect cardSect4 = { 307,79,26,46 };
 	SDL_Rect cardSect5 = { 339,79,26,46 };
 	SDL_Rect pacSect = { 40,144,9,11 };
+	SDL_Rect pointButtonSect = { 190,322,16,16 };
+	SDL_Rect safetyButtonSect = { 156,324,22,12 };
+	SDL_Rect numberButtonSect = { 4,206,30,14 };
+	SDL_Rect numberButtonSect2 = { 4,222,30,14 };
+	SDL_Rect numberButtonSect3 = { 4,238,30,14 };
+	SDL_Rect numberButtonSect4 = { 4,254,30,14 };
+	SDL_Rect numberButtonSect5 = { 4,270,30,14 };
+	SDL_Rect numberButtonSect6 = { 4,286,30,14 };
+	SDL_Rect numberButtonSect7 = { 4,302,30,14 };
 	Animation cardAnim;
 	Animation eggAnim;
 	Animation eggAnim2;
 	Animation eggAnim3;
+	int pointCounter;
+	bool pacBool;
+	bool cardBool;
+	bool executeOrderSafety;
 
 	SDL_Texture* background;
 	p2Point<int> ray;
@@ -279,6 +296,8 @@ public:
 	uint bumperFx;
 	uint fallFx;
 	uint wallPacFx;
+	uint buttonFx;
+	uint sideBumperFx;
 
 	// Font stuff
 	int font = -1;
@@ -298,6 +317,8 @@ public:
 	char balls[6] = { "\0" };
 	char ballsNum[2] = { "\0" };
 
+	char pointCounterNum[8] = { "\0" };
+
 
 	Scene currentScene;
 
@@ -316,4 +337,11 @@ public:
 	bool bonusBool;
 	PhysBody* bonusBody = nullptr;
 	SDL_Rect ballSect = { 140,880,24,26 };
+
+	// EXIT //
+	bool exitBool;
+	bool createExit;
+	PhysBody* exitBody = nullptr;
+	SDL_Rect exitSect = { 126,290,38,14 };
+	SDL_Rect exitRectSect = { 256,588,22,44 };
 };

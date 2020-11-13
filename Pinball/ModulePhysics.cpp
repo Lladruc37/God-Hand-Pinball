@@ -49,6 +49,16 @@ update_status ModulePhysics::PreUpdate()
 		delete App->scene_intro->bonusBody;
 		App->scene_intro->bonusBody = nullptr;
 	}
+	if (App->scene_intro->exitBody != nullptr && App->scene_intro->exitBody->pendingToDelete == true)
+	{
+		App->scene_intro->exitBody->pendingToDelete = false;
+		delete App->scene_intro->exitBody;
+		App->scene_intro->exitBody = nullptr;
+	}
+	if (App->scene_intro->createExit == true) {
+		App->scene_intro->createExit = false;
+		App->scene_intro->exitBody = App->physics->CreateRectangle(App->scene_intro->exitRectSect.x + App->scene_intro->exitRectSect.w * 3 / 2, App->scene_intro->exitRectSect.y + App->scene_intro->exitRectSect.h / 2, App->scene_intro->exitRectSect.w, App->scene_intro->exitRectSect.h, b2_staticBody);
+	}
 
 	for (b2Contact* c = world->GetContactList(); c; c = c->GetNext())
 	{
@@ -69,6 +79,7 @@ PhysBody* ModulePhysics::CreateCircle(int x, int y, int radius, b2BodyType type)
 	b2BodyDef body;
 	body.type = type;
 	body.position.Set(PIXEL_TO_METERS(x), PIXEL_TO_METERS(y));
+	body.bullet = true;
 
 	b2Body* b = world->CreateBody(&body);
 
