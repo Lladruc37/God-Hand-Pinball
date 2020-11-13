@@ -63,6 +63,13 @@ bool ModuleSceneIntro::Start()
 	pointSensor3->isActive = false;
 	sensors.add(pointSensor3);
 
+	Sensor* pointSensor4 = new Sensor;
+	pointSensor4->sensor = App->physics->CreateRectangleSensor(274, 200, 10, 11, b2_staticBody);
+	pointSensor4->sensor->listener = this;
+	pointSensor4->value = Sensor::HUNDREDS;
+	pointSensor4->isActive = false;
+	sensors.add(pointSensor4);
+
 	Sensor* cardSensor1 = new Sensor;
 	cardSensor1->sensor = App->physics->CreateRectangleSensor(87, 580, 10, 10, b2_staticBody);
 	cardSensor1->sensor->listener = this;
@@ -330,6 +337,16 @@ bool ModuleSceneIntro::Start()
 	eggAnim3.PushBack({ 153,7,18,26 });
 	eggAnim3.loop = true;
 
+	sealAnim.PushBack({ 124,154,32,32 });
+	sealAnim.PushBack({ 158,154,32,32 });
+	sealAnim.loop = true;
+	sealAnim.speed = 0.175f;
+
+	ballAnim.PushBack({ 160,126,14,16 });
+	ballAnim.PushBack({ 180,126,14,16 });
+	ballAnim.loop = true;
+	ballAnim.speed = 0.175f;
+
 	pointCounter = 100;
 	pacBool = true;
 	cardBool = true;
@@ -445,14 +462,25 @@ update_status ModuleSceneIntro::Update()
 
 			SDL_Rect sect = { 350, 0, 336, 954 };
 			App->renderer->Blit(background, 0, 0, true, &sect);
+			App->renderer->Blit(App->player->playerText, 88, 224, false, &sealAnim.GetCurrentFrame());
+			App->renderer->Blit(App->player->playerText, 184, 224, false, &sealAnim.GetCurrentFrame(), true);
+			App->renderer->Blit(App->player->playerText, 96, 206, false, &ballAnim.GetCurrentFrame());
+			App->renderer->Blit(App->player->playerText, 194, 206, false, &ballAnim.GetCurrentFrame(), true);
 
 			// Bonus counter
 			int bonusCounter = 0;
 			SDL_Rect bonusSect = { 700,0,336,954 };
-			p2List_item<Sensor*>* bonus = sensors.getFirst();
-			while (bonus != NULL)
+			// Exit counter
+			int exitCounter = 0;
+			// Pac man counter
+			int pacCounter = 0;
+			// Card counter
+			int cardCounter = 0;
+
+			p2List_item<Sensor*>* sensor = sensors.getFirst();
+			while (sensor != NULL)
 			{
-				if (bonus->data->isActive == true && bonus->data->value == Sensor::CARD) {
+				if (sensor->data->isActive == true && sensor->data->value == Sensor::CARD) {
 					bonusCounter++;
 					if (bonusCounter == 5) {
 						App->renderer->Blit(background, 0, 0, true, &bonusSect);
@@ -466,15 +494,8 @@ update_status ModuleSceneIntro::Update()
 						App->renderer->Blit(background, x, y, false, &ballSect);
 					}
 				}
-				bonus = bonus->next;
-			}
 
-			// Exit counter
-			int exitCounter = 0;
-			p2List_item<Sensor*>* exit = sensors.getFirst();
-			while (exit != NULL)
-			{
-				if (exit->data->isActive == false && exit->data->value == Sensor::NUMBER_BUTTON) {
+				if (sensor->data->isActive == false && sensor->data->value == Sensor::NUMBER_BUTTON) {
 					exitCounter++;
 					if (exitCounter == 7) {
 						App->renderer->Blit(background, exitRectSect.x + exitRectSect.w, exitRectSect.y, false, &exitRectSect);
@@ -486,38 +507,44 @@ update_status ModuleSceneIntro::Update()
 						App->renderer->Blit(App->player->playerText, 232, 599, false, &exitSect);
 					}
 				}
-				exit = exit->next;
-			}
 
-			// Pac man counter
-			int pacCounter = 0;
-			p2List_item<Sensor*>* pac = sensors.getFirst();
-			while (pac != NULL)
-			{
-				if (pac->data->isActive == true && pac->data->value == Sensor::PAC_MAN) {
+				if (sensor->data->isActive == true && sensor->data->value == Sensor::PAC_MAN) {
 					pacCounter++;
-					if (pacCounter == 8 && pacBool) {
-						pacBool = false;
-						App->player->currentScore += 2000;
-						pointCounter = 100;
+					if (pacCounter == 8) {
+						int currentLoopCount = sealAnim.loopCount;
+						if (sealAnim.loopCount != 20)
+						{
+							sealAnim.Update();
+							ballAnim.Update();
+						}
+						if (currentLoopCount != sealAnim.loopCount)
+						{
+							App->audio->PlayFx(bumperFx);
+							bumpers.getFirst()->data->animation.Update();
+							App->player->currentScore += 100;
+						}
+						if (pacBool)
+						{
+							pacBool = false;
+							pointCounter = 100;
+						}
+					}
+					if (sealAnim.loopCount == 20)
+					{
+						sensor->data->isActive = false;
+						pacCounter--;
 					}
 				}
-				pac = pac->next;
-			}
 
-			// Card counter
-			int cardCounter = 0;
-			p2List_item<Sensor*>* card = sensors.getFirst();
-			while (card != NULL)
-			{
-				if (card->data->isActive == true && card->data->value == Sensor::CARD) {
+				if (sensor->data->isActive == true && sensor->data->value == Sensor::CARD) {
 					cardCounter++;
 					if (cardCounter == 5 && cardBool) {
 						cardBool = false;
 						App->player->currentScore += 5000;
 					}
 				}
-				card = card->next;
+
+				sensor = sensor->next;
 			}
 
 			int x, y;
@@ -542,33 +569,43 @@ update_status ModuleSceneIntro::Update()
 				{
 				case Sensor::CARD:
 					if (s->data->isActive == true) {
-						if (x == 77) {
+						switch (x)
+						{
+						case 77:
 							App->renderer->Blit(App->player->playerText, x - 2, y - cardSect.h, false, &cardSect, false, 1.0f, s->data->sensor->GetRotation());
-						}
-						else if (x == 109) {
+							break;
+						case 109:
 							App->renderer->Blit(App->player->playerText, x - 2, y - cardSect2.h, false, &cardSect2, false, 1.0f, s->data->sensor->GetRotation());
-						}
-						else if (x == 141) {
+							break;
+						case 141:
 							App->renderer->Blit(App->player->playerText, x - 2, y - cardSect3.h, false, &cardSect3, false, 1.0f, s->data->sensor->GetRotation());
-						}
-						else if (x == 173) {
+							break;
+						case 173:
 							App->renderer->Blit(App->player->playerText, x - 2, y - cardSect4.h, false, &cardSect4, false, 1.0f, s->data->sensor->GetRotation());
-						}
-						else if (x == 205) {
+							break;
+						case 205:
 							App->renderer->Blit(App->player->playerText, x - 2, y - cardSect5.h, false, &cardSect5, false, 1.0f, s->data->sensor->GetRotation());
+							break;
+						default:
+							break;
 						}
 					}
 					break;
 				case Sensor::EGG:
 					if (s->data->isActive == true) {
-						if (x == 101) {
+						switch (x)
+						{
+						case 101:
 							App->renderer->Blit(App->player->playerText, x, y, false, &eggAnim.GetCurrentFrame(), false, 1.0f, s->data->sensor->GetRotation());
-						}
-						else if (x == 141) {
+							break;
+						case 141:
 							App->renderer->Blit(App->player->playerText, x, y, false, &eggAnim2.GetCurrentFrame(), false, 1.0f, s->data->sensor->GetRotation());
-						}
-						else if (x == 181) {
+							break;
+						case 181:
 							App->renderer->Blit(App->player->playerText, x, y, false, &eggAnim3.GetCurrentFrame(), false, 1.0f, s->data->sensor->GetRotation());
+							break;
+						default:
+							break;
 						}
 					}
 					break;
@@ -589,26 +626,31 @@ update_status ModuleSceneIntro::Update()
 					break;
 				case Sensor::NUMBER_BUTTON:
 					if (s->data->isActive == true) {
-						if (y == 578) {
+						switch (y)
+						{
+						case 578:
 							App->renderer->Blit(App->player->playerText, x + numberButtonSect.w / 2 - 13, y + numberButtonSect.h / 2, false, &numberButtonSect, false, 1.0f, s->data->sensor->GetRotation());
-						}
-						else if (y == 594) {
+							break;
+						case 594:
 							App->renderer->Blit(App->player->playerText, x + numberButtonSect2.w / 2 - 13, y + numberButtonSect2.h / 2, false, &numberButtonSect2, false, 1.0f, s->data->sensor->GetRotation());
-						}
-						else if (y == 610) {
+							break;
+						case 610:
 							App->renderer->Blit(App->player->playerText, x + numberButtonSect3.w / 2 - 13, y + numberButtonSect3.h / 2, false, &numberButtonSect3, false, 1.0f, s->data->sensor->GetRotation());
-						}
-						else if (y == 625) {
+							break;
+						case 625:
 							App->renderer->Blit(App->player->playerText, x + numberButtonSect4.w / 2 - 13, y + numberButtonSect4.h / 2 + 1, false, &numberButtonSect4, false, 1.0f, s->data->sensor->GetRotation());
-						}
-						else if (y == 642) {
+							break;
+						case 642:
 							App->renderer->Blit(App->player->playerText, x + numberButtonSect5.w / 2 - 13, y + numberButtonSect5.h / 2, false, &numberButtonSect5, false, 1.0f, s->data->sensor->GetRotation());
-						}
-						else if (y == 658) {
+							break;
+						case 658:
 							App->renderer->Blit(App->player->playerText, x + numberButtonSect6.w / 2 - 13, y + numberButtonSect6.h / 2, false, &numberButtonSect6, false, 1.0f, s->data->sensor->GetRotation());
-						}
-						else if (y == 673) {
+							break;
+						case 673:
 							App->renderer->Blit(App->player->playerText, x + numberButtonSect7.w / 2 - 13, y + numberButtonSect7.h / 2 + 1, false, &numberButtonSect7, false, 1.0f, s->data->sensor->GetRotation());
+							break;
+						default:
+							break;
 						}
 					}
 					break;
@@ -616,6 +658,12 @@ update_status ModuleSceneIntro::Update()
 					break;
 				}
 				s = s->next;
+			}
+
+			if (pacCounter == 0)
+			{
+				sealAnim.Reset();
+				ballAnim.Reset();
 			}
 
 			// Text UI ----------------

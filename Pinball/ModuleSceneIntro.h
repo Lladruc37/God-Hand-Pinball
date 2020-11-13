@@ -77,6 +77,8 @@ public:
 	Animation eggAnim;
 	Animation eggAnim2;
 	Animation eggAnim3;
+	Animation sealAnim;
+	Animation ballAnim;
 	int pointCounter;
 	bool pacBool;
 	bool cardBool;

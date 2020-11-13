@@ -139,7 +139,7 @@ update_status ModulePlayer::Update()
 		}
 
 		// Extra ball ----------------------------------------------------
-		if (currentScore % 50000 == 0) {
+		if (currentScore != 0 && (currentScore % 50000) == 0) {
 			ballCount++;
 		}
 
@@ -147,6 +147,11 @@ update_status ModulePlayer::Update()
 		if (isDead)
 		{
 			isDead = false;
+			if (App->physics->mouse_joint != nullptr)
+			{
+				App->physics->mouse_joint->GetBodyA()->GetWorld()->DestroyJoint(App->physics->mouse_joint);
+				App->physics->mouse_joint = nullptr;
+			}
 			p2List_item<PhysBody*>* c = circles.getFirst();
 			while (c != NULL)
 			{

@@ -62,13 +62,13 @@ public:
 	void BeginContact(b2Contact* contact) override;
 
 	bool debug;
+	b2MouseJoint* mouse_joint;
 
 private:
 
 	b2World* world;
 	b2Body* ground;
 
-	b2MouseJoint* mouse_joint;
 	b2Body* mouseBody;
 	b2Vec2 p;
 

@@ -323,7 +323,7 @@ update_status ModulePhysics::PostUpdate()
 		}
 	}
 
-	if (mouseBody != nullptr)
+	if (mouseBody != nullptr && mouse_joint != nullptr)
 	{
 		if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT)
 		{
