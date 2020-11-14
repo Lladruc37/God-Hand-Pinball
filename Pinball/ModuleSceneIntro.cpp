@@ -33,238 +33,44 @@ bool ModuleSceneIntro::Start()
 	wallPacFx = App->audio->LoadFx("pinball/audio/fx/WallButton_PacMan.wav");
 	buttonFx = App->audio->LoadFx("pinball/audio/fx/PointButton_SafetyButton.wav");
 	sideBumperFx = App->audio->LoadFx("pinball/audio/fx/SideBumpers.wav");
+	pathsFx = App->audio->LoadFx("pinball/audio/fx/Paths.wav");
+	holeSafetyFx = App->audio->LoadFx("pinball/audio/fx/Hole_SpawnSafety.wav");
+	eggFx = App->audio->LoadFx("pinball/audio/fx/PinkPlatform_BreakOpenEgg.wav");
 
 	// Sensors
-	Sensor* deathSensor = new Sensor;
-	deathSensor->sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 10, b2_staticBody);
-	deathSensor->sensor->listener = this;
-	deathSensor->value = Sensor::DEATH;
-	deathSensor->isActive = false;
-	sensors.add(deathSensor);
-
-	Sensor* pointSensor1 = new Sensor;
-	pointSensor1->sensor = App->physics->CreateRectangleSensor(120, 120, 10, 10, b2_staticBody);
-	pointSensor1->sensor->listener = this;
-	pointSensor1->value = Sensor::HUNDREDS;
-	pointSensor1->isActive = false;
-	sensors.add(pointSensor1);
-
-	Sensor* pointSensor2 = new Sensor;
-	pointSensor2->sensor = App->physics->CreateRectangleSensor(152, 120, 10, 10, b2_staticBody);
-	pointSensor2->sensor->listener = this;
-	pointSensor2->value = Sensor::THOUSAND;
-	pointSensor2->isActive = false;
-	sensors.add(pointSensor2);
-
-	Sensor* pointSensor3 = new Sensor;
-	pointSensor3->sensor = App->physics->CreateRectangleSensor(184, 120, 10, 10, b2_staticBody);
-	pointSensor3->sensor->listener = this;
-	pointSensor3->value = Sensor::HUNDREDS;
-	pointSensor3->isActive = false;
-	sensors.add(pointSensor3);
-
-	Sensor* pointSensor4 = new Sensor;
-	pointSensor4->sensor = App->physics->CreateRectangleSensor(274, 200, 10, 11, b2_staticBody);
-	pointSensor4->sensor->listener = this;
-	pointSensor4->value = Sensor::HUNDREDS;
-	pointSensor4->isActive = false;
-	sensors.add(pointSensor4);
-
-	Sensor* cardSensor1 = new Sensor;
-	cardSensor1->sensor = App->physics->CreateRectangleSensor(87, 580, 10, 10, b2_staticBody);
-	cardSensor1->sensor->listener = this;
-	cardSensor1->value = Sensor::CARD;
-	cardSensor1->isActive = false;
-	sensors.add(cardSensor1);
-
-	Sensor* cardSensor2 = new Sensor;
-	cardSensor2->sensor = App->physics->CreateRectangleSensor(120, 580, 10, 10, b2_staticBody);
-	cardSensor2->sensor->listener = this;
-	cardSensor2->value = Sensor::CARD;
-	cardSensor2->isActive = false;
-	sensors.add(cardSensor2);
-
-	Sensor* cardSensor3 = new Sensor;
-	cardSensor3->sensor = App->physics->CreateRectangleSensor(151, 580, 10, 10, b2_staticBody);
-	cardSensor3->sensor->listener = this;
-	cardSensor3->value = Sensor::CARD;
-	cardSensor3->isActive = false;
-	sensors.add(cardSensor3);
-
-	Sensor* cardSensor4 = new Sensor;
-	cardSensor4->sensor = App->physics->CreateRectangleSensor(183, 580, 10, 10, b2_staticBody);
-	cardSensor4->sensor->listener = this;
-	cardSensor4->value = Sensor::CARD;
-	cardSensor4->isActive = false;
-	sensors.add(cardSensor4);
-
-	Sensor* cardSensor5 = new Sensor;
-	cardSensor5->sensor = App->physics->CreateRectangleSensor(216, 580, 10, 10, b2_staticBody);
-	cardSensor5->sensor->listener = this;
-	cardSensor5->value = Sensor::CARD;
-	cardSensor5->isActive = false;
-	sensors.add(cardSensor5);
-
-	Sensor* eggSensor1 = new Sensor;
-	eggSensor1->sensor = App->physics->CreateRectangleSensor(111, 783, 10, 10, b2_staticBody);
-	eggSensor1->sensor->listener = this;
-	eggSensor1->value = Sensor::EGG;
-	eggSensor1->isActive = false;
-	sensors.add(eggSensor1);
-
-	Sensor* eggSensor2 = new Sensor;
-	eggSensor2->sensor = App->physics->CreateRectangleSensor(151, 783, 10, 10, b2_staticBody);
-	eggSensor2->sensor->listener = this;
-	eggSensor2->value = Sensor::EGG;
-	eggSensor2->isActive = false;
-	sensors.add(eggSensor2);
-
-	Sensor* eggSensor3 = new Sensor;
-	eggSensor3->sensor = App->physics->CreateRectangleSensor(191, 783, 10, 10, b2_staticBody);
-	eggSensor3->sensor->listener = this;
-	eggSensor3->value = Sensor::EGG;
-	eggSensor3->isActive = false;
-	sensors.add(eggSensor3);
-
-	/*Sensor* holeSensor1 = new Sensor;
-	holeSensor1->sensor = App->physics->CreateRectangleSensor(280, 360, 10, 10, b2_staticBody);
-	holeSensor1->sensor->listener = this;
-	holeSensor1->value = Sensor::TP;
-	holeSensor1->isActive = false;
-	sensors.add(holeSensor1);
-
-	Sensor* holeSensor2 = new Sensor;
-	holeSensor2->sensor = App->physics->CreateRectangleSensor(280, 535, 10, 10, b2_staticBody);
-	holeSensor2->sensor->listener = this;
-	holeSensor2->value = Sensor::TP;
-	holeSensor2->isActive = false;
-	sensors.add(holeSensor2);*/
-
-	Sensor* pacSensor1 = new Sensor;
-	pacSensor1->sensor = App->physics->CreateRectangleSensor(47, 87, 10, 10, b2_staticBody);
-	pacSensor1->sensor->listener = this;
-	pacSensor1->value = Sensor::PAC_MAN;
-	pacSensor1->isActive = false;
-	sensors.add(pacSensor1);
-
-	Sensor* pacSensor2 = new Sensor;
-	pacSensor2->sensor = App->physics->CreateRectangleSensor(36, 101, 10, 10, b2_staticBody);
-	pacSensor2->sensor->listener = this;
-	pacSensor2->value = Sensor::PAC_MAN;
-	pacSensor2->isActive = false;
-	sensors.add(pacSensor2);
-
-	Sensor* pacSensor3 = new Sensor;
-	pacSensor3->sensor = App->physics->CreateRectangleSensor(28, 117, 10, 10, b2_staticBody);
-	pacSensor3->sensor->listener = this;
-	pacSensor3->value = Sensor::PAC_MAN;
-	pacSensor3->isActive = false;
-	sensors.add(pacSensor3);
-
-	Sensor* pacSensor4 = new Sensor;
-	pacSensor4->sensor = App->physics->CreateRectangleSensor(24, 135, 10, 10, b2_staticBody);
-	pacSensor4->sensor->listener = this;
-	pacSensor4->value = Sensor::PAC_MAN;
-	pacSensor4->isActive = false;
-	sensors.add(pacSensor4);
-
-	Sensor* pacSensor5 = new Sensor;
-	pacSensor5->sensor = App->physics->CreateRectangleSensor(24, 153, 10, 10, b2_staticBody);
-	pacSensor5->sensor->listener = this;
-	pacSensor5->value = Sensor::PAC_MAN;
-	pacSensor5->isActive = false;
-	sensors.add(pacSensor5);
-
-	Sensor* pacSensor6 = new Sensor;
-	pacSensor6->sensor = App->physics->CreateRectangleSensor(26, 171, 10, 10, b2_staticBody);
-	pacSensor6->sensor->listener = this;
-	pacSensor6->value = Sensor::PAC_MAN;
-	pacSensor6->isActive = false;
-	sensors.add(pacSensor6);
-
-	Sensor* pacSensor7 = new Sensor;
-	pacSensor7->sensor = App->physics->CreateRectangleSensor(32, 187, 10, 10, b2_staticBody);
-	pacSensor7->sensor->listener = this;
-	pacSensor7->value = Sensor::PAC_MAN;
-	pacSensor7->isActive = false;
-	sensors.add(pacSensor7);
-
-	Sensor* pacSensor8 = new Sensor;
-	pacSensor8->sensor = App->physics->CreateRectangleSensor(38, 203, 10, 10, b2_staticBody);
-	pacSensor8->sensor->listener = this;
-	pacSensor8->value = Sensor::PAC_MAN;
-	pacSensor8->isActive = false;
-	sensors.add(pacSensor8);
-
-	Sensor* pointButtonSensor = new Sensor;
-	pointButtonSensor->sensor = App->physics->CreateRectangleSensor(90, 166, 16, 16, b2_staticBody);
-	pointButtonSensor->sensor->listener = this;
-	pointButtonSensor->value = Sensor::POINT_BUTTON;
-	pointButtonSensor->isActive = false;
-	sensors.add(pointButtonSensor);
-
-	Sensor* safetyButtonSensor1 = new Sensor;
-	safetyButtonSensor1->sensor = App->physics->CreateRectangleSensor(21, 814, 22, 12, b2_staticBody);
-	safetyButtonSensor1->sensor->listener = this;
-	safetyButtonSensor1->value = Sensor::SAFETY_BUTTON;
-	safetyButtonSensor1->isActive = true;
-	sensors.add(safetyButtonSensor1);
-
-	Sensor* safetyButtonSensor2 = new Sensor;
-	safetyButtonSensor2->sensor = App->physics->CreateRectangleSensor(283, 814, 22, 12, b2_staticBody);
-	safetyButtonSensor2->sensor->listener = this;
-	safetyButtonSensor2->value = Sensor::SAFETY_BUTTON;
-	safetyButtonSensor2->isActive = true;
-	sensors.add(safetyButtonSensor2);
-
-	Sensor* numberButtonSensor = new Sensor;
-	numberButtonSensor->sensor = App->physics->CreateRectangleSensor(28, 592, 4, 14, b2_staticBody);
-	numberButtonSensor->sensor->listener = this;
-	numberButtonSensor->value = Sensor::NUMBER_BUTTON;
-	numberButtonSensor->isActive = true;
-	sensors.add(numberButtonSensor);
-
-	Sensor* numberButtonSensor2 = new Sensor;
-	numberButtonSensor2->sensor = App->physics->CreateRectangleSensor(28, 609, 4, 14, b2_staticBody);
-	numberButtonSensor2->sensor->listener = this;
-	numberButtonSensor2->value = Sensor::NUMBER_BUTTON;
-	numberButtonSensor2->isActive = true;
-	sensors.add(numberButtonSensor2);
-
-	Sensor* numberButtonSensor3 = new Sensor;
-	numberButtonSensor3->sensor = App->physics->CreateRectangleSensor(28, 624, 4, 14, b2_staticBody);
-	numberButtonSensor3->sensor->listener = this;
-	numberButtonSensor3->value = Sensor::NUMBER_BUTTON;
-	numberButtonSensor3->isActive = true;
-	sensors.add(numberButtonSensor3);
-
-	Sensor* numberButtonSensor4 = new Sensor;
-	numberButtonSensor4->sensor = App->physics->CreateRectangleSensor(28, 640, 4, 14, b2_staticBody);
-	numberButtonSensor4->sensor->listener = this;
-	numberButtonSensor4->value = Sensor::NUMBER_BUTTON;
-	numberButtonSensor4->isActive = true;
-	sensors.add(numberButtonSensor4);
-
-	Sensor* numberButtonSensor5 = new Sensor;
-	numberButtonSensor5->sensor = App->physics->CreateRectangleSensor(28, 656, 4, 14, b2_staticBody);
-	numberButtonSensor5->sensor->listener = this;
-	numberButtonSensor5->value = Sensor::NUMBER_BUTTON;
-	numberButtonSensor5->isActive = true;
-	sensors.add(numberButtonSensor5);
-
-	Sensor* numberButtonSensor6 = new Sensor;
-	numberButtonSensor6->sensor = App->physics->CreateRectangleSensor(28, 672, 4, 14, b2_staticBody);
-	numberButtonSensor6->sensor->listener = this;
-	numberButtonSensor6->value = Sensor::NUMBER_BUTTON;
-	numberButtonSensor6->isActive = true;
-	sensors.add(numberButtonSensor6);
-
-	Sensor* numberButtonSensor7 = new Sensor;
-	numberButtonSensor7->sensor = App->physics->CreateRectangleSensor(28, 688, 4, 14, b2_staticBody);
-	numberButtonSensor7->sensor->listener = this;
-	numberButtonSensor7->value = Sensor::NUMBER_BUTTON;
-	numberButtonSensor7->isActive = true;
-	sensors.add(numberButtonSensor7);
+	CreateSensor(App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 10, b2_staticBody), Sensor::DEATH, false);
+	CreateSensor(App->physics->CreateRectangleSensor(120, 120, 10, 10, b2_staticBody), Sensor::HUNDREDS, false);
+	CreateSensor(App->physics->CreateRectangleSensor(152, 120, 10, 10, b2_staticBody), Sensor::THOUSAND, false);
+	CreateSensor(App->physics->CreateRectangleSensor(184, 120, 10, 10, b2_staticBody), Sensor::HUNDREDS, false);
+	CreateSensor(App->physics->CreateRectangleSensor(274, 200, 25, 11, b2_staticBody), Sensor::HUNDREDS, false);
+	CreateSensor(App->physics->CreateRectangleSensor(87, 580, 10, 10, b2_staticBody), Sensor::CARD, false);
+	CreateSensor(App->physics->CreateRectangleSensor(120, 580, 10, 10, b2_staticBody), Sensor::CARD, false);
+	CreateSensor(App->physics->CreateRectangleSensor(151, 580, 10, 10, b2_staticBody), Sensor::CARD, false);
+	CreateSensor(App->physics->CreateRectangleSensor(183, 580, 10, 10, b2_staticBody), Sensor::CARD, false);
+	CreateSensor(App->physics->CreateRectangleSensor(216, 580, 10, 10, b2_staticBody), Sensor::CARD, false);
+	CreateSensor(App->physics->CreateRectangleSensor(111, 783, 10, 10, b2_staticBody), Sensor::EGG, false);
+	CreateSensor(App->physics->CreateRectangleSensor(151, 783, 10, 10, b2_staticBody), Sensor::EGG, false);
+	CreateSensor(App->physics->CreateRectangleSensor(191, 783, 10, 10, b2_staticBody), Sensor::EGG, false);
+	CreateSensor(App->physics->CreateRectangleSensor(47, 87, 10, 10, b2_staticBody), Sensor::PAC_MAN, false);
+	CreateSensor(App->physics->CreateRectangleSensor(36, 101, 10, 10, b2_staticBody), Sensor::PAC_MAN, false);
+	CreateSensor(App->physics->CreateRectangleSensor(28, 117, 10, 10, b2_staticBody), Sensor::PAC_MAN, false);
+	CreateSensor(App->physics->CreateRectangleSensor(24, 135, 10, 10, b2_staticBody), Sensor::PAC_MAN, false);
+	CreateSensor(App->physics->CreateRectangleSensor(24, 153, 10, 10, b2_staticBody), Sensor::PAC_MAN, false);
+	CreateSensor(App->physics->CreateRectangleSensor(26, 171, 10, 10, b2_staticBody), Sensor::PAC_MAN, false);
+	CreateSensor(App->physics->CreateRectangleSensor(32, 187, 10, 10, b2_staticBody), Sensor::PAC_MAN, false);
+	CreateSensor(App->physics->CreateRectangleSensor(38, 203, 10, 10, b2_staticBody), Sensor::PAC_MAN, false);
+	CreateSensor(App->physics->CreateRectangleSensor(90, 166, 14, 14, b2_staticBody), Sensor::POINT_BUTTON, false);
+	CreateSensor(App->physics->CreateRectangleSensor(21, 814, 22, 12, b2_staticBody), Sensor::SAFETY_BUTTON, true);
+	CreateSensor(App->physics->CreateRectangleSensor(283, 814, 22, 12, b2_staticBody), Sensor::SAFETY_BUTTON, true);
+	CreateSensor(App->physics->CreateRectangleSensor(28, 592, 4, 14, b2_staticBody), Sensor::NUMBER_BUTTON, true);
+	CreateSensor(App->physics->CreateRectangleSensor(28, 609, 4, 14, b2_staticBody), Sensor::NUMBER_BUTTON, true);
+	CreateSensor(App->physics->CreateRectangleSensor(28, 624, 4, 14, b2_staticBody), Sensor::NUMBER_BUTTON, true);
+	CreateSensor(App->physics->CreateRectangleSensor(28, 640, 4, 14, b2_staticBody), Sensor::NUMBER_BUTTON, true);
+	CreateSensor(App->physics->CreateRectangleSensor(28, 656, 4, 14, b2_staticBody), Sensor::NUMBER_BUTTON, true);
+	CreateSensor(App->physics->CreateRectangleSensor(28, 672, 4, 14, b2_staticBody), Sensor::NUMBER_BUTTON, true);
+	CreateSensor(App->physics->CreateRectangleSensor(28, 688, 4, 14, b2_staticBody), Sensor::NUMBER_BUTTON, true);
+	CreateSensor(App->physics->CreateRectangleSensor(280, 360, 15, 15, b2_staticBody), Sensor::TP, false);
+	CreateSensor(App->physics->CreateRectangleSensor(280, 535, 15, 15, b2_staticBody), Sensor::TP, false);
 
 	// BACKGROUND -------------------------------------------------------------------------------------
 	backgrounds.add(App->physics->CreateChain(0, 0, backgroundChain, 76, b2_staticBody));
@@ -272,6 +78,7 @@ bool ModuleSceneIntro::Start()
 	backgrounds.add(App->physics->CreateChain(0, 0, TopLeftSmol, 8, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, TopRightSmol, 8, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, TopRightBig, 72, b2_staticBody));
+	backgrounds.add(App->physics->CreateChain(0, 0, TopRightTunnelWall, 16, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, TopRightGreen, 22, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, MidLeft, 20, b2_staticBody));
 	backgrounds.add(App->physics->CreateChain(0, 0, FirstCardPellet, 8, b2_staticBody));
@@ -420,6 +227,7 @@ update_status ModuleSceneIntro::PreUpdate() {
 // Update: draw background
 update_status ModuleSceneIntro::Update()
 {
+	srand(time(NULL));
 	switch (currentScene)
 	{
 	case TITLE_SCREEN:
@@ -439,6 +247,16 @@ update_status ModuleSceneIntro::Update()
 
 	case PINBALL:
 		{
+			p2List_item<Sensor*>* timer = sensors.getFirst();
+			while (timer != NULL)
+			{
+				if (timer->data->sensorTimer < 100)
+				{
+					timer->data->sensorTimer++;
+				}
+				timer = timer->next;
+			}
+
 			if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && App->physics->debug)
 			{
 				ray_on = !ray_on;
@@ -463,23 +281,9 @@ update_status ModuleSceneIntro::Update()
 			SDL_Rect sect = { 350, 0, 336, 954 };
 			App->renderer->Blit(background, 0, 0, true, &sect);
 
-			// Seal blitting
-			App->renderer->Blit(App->player->playerText, 88, 224, false, &sealAnim.GetCurrentFrame());
-			App->renderer->Blit(App->player->playerText, 184, 224, false, &sealAnim.GetCurrentFrame(), true);
-			App->renderer->Blit(App->player->playerText, 96, 206, false, &ballAnim.GetCurrentFrame());
-			App->renderer->Blit(App->player->playerText, 194, 206, false, &ballAnim.GetCurrentFrame(), true);
-
 			// Bonus counter
 			int bonusCounter = 0;
 			SDL_Rect bonusSect = { 700,0,336,954 };
-			// Exit counter
-			int exitCounter = 0;
-			// Pac man counter
-			int pacCounter = 0;
-			// Card counter
-			int cardCounter = 0;
-
-			// Counting lots of stuf
 			p2List_item<Sensor*>* sensor = sensors.getFirst();
 			while (sensor != NULL)
 			{
@@ -497,8 +301,27 @@ update_status ModuleSceneIntro::Update()
 						App->renderer->Blit(background, x, y, false, &ballSect);
 					}
 				}
+				sensor = sensor->next;
+			}
 
-				if (sensor->data->isActive == false && sensor->data->value == Sensor::NUMBER_BUTTON) {
+			// Seal blitting
+			App->renderer->Blit(App->player->playerText, 88, 224, false, &sealAnim.GetCurrentFrame());
+			App->renderer->Blit(App->player->playerText, 184, 224, false, &sealAnim.GetCurrentFrame(), true);
+			App->renderer->Blit(App->player->playerText, 96, 206, false, &ballAnim.GetCurrentFrame());
+			App->renderer->Blit(App->player->playerText, 194, 206, false, &ballAnim.GetCurrentFrame(), true);
+
+			// Exit counter
+			int exitCounter = 0;
+			// Pac man counter
+			int pacCounter = 0;
+			// Card counter
+			int cardCounter = 0;
+
+			// Counting lots of stuf
+			p2List_item<Sensor*>* sensor2 = sensors.getFirst();
+			while (sensor2 != NULL)
+			{
+				if (sensor2->data->isActive == false && sensor2->data->value == Sensor::NUMBER_BUTTON) {
 					exitCounter++;
 					if (exitCounter == 7) {
 						App->renderer->Blit(background, exitRectSect.x + exitRectSect.w, exitRectSect.y, false, &exitRectSect);
@@ -511,7 +334,7 @@ update_status ModuleSceneIntro::Update()
 					}
 				}
 
-				if (sensor->data->isActive == true && sensor->data->value == Sensor::PAC_MAN) {
+				if (sensor2->data->isActive == true && sensor2->data->value == Sensor::PAC_MAN) {
 					pacCounter++;
 					if (pacCounter == 8) {
 						int currentLoopCount = sealAnim.loopCount;
@@ -534,12 +357,13 @@ update_status ModuleSceneIntro::Update()
 					}
 					if (sealAnim.loopCount == 20)
 					{
-						sensor->data->isActive = false;
+						sensor2->data->isActive = false;
+						pacBool = true;
 						pacCounter--;
 					}
 				}
 
-				if (sensor->data->isActive == true && sensor->data->value == Sensor::CARD) {
+				if (sensor2->data->isActive == true && sensor2->data->value == Sensor::CARD) {
 					cardCounter++;
 					if (cardCounter == 5 && cardBool) {
 						cardBool = false;
@@ -547,13 +371,20 @@ update_status ModuleSceneIntro::Update()
 					}
 				}
 
-				sensor = sensor->next;
+				sensor2 = sensor2->next;
 			}
 
 			// Blitting kicker
 			int kickerX, kickerY;
 			App->player->kicker.mobile->GetPosition(kickerX, kickerY);
-			App->renderer->Blit(background, kickerX, kickerY - 88, false, &App->player->kickerSect);
+			if (bonusCounter == 5)
+			{
+				App->renderer->Blit(background, kickerX, kickerY - 88, false, &App->player->kickerSectBonus);
+			}
+			else
+			{
+				App->renderer->Blit(background, kickerX, kickerY - 88, false, &App->player->kickerSect);
+			}
 
 			// Blitting bumpers
 			p2List_item<Bumper*>* b = bumpers.getFirst();
@@ -673,23 +504,19 @@ update_status ModuleSceneIntro::Update()
 			}
 
 			// Text UI ----------------
-			sprintf_s(prevScore, 8, "P-SCORE");
-			App->fonts->BlitText(fontSize * 2, fontSize * 1, font, prevScore);
+			App->fonts->BlitText(fontSize * 2, fontSize * 1, font, "P-SCORE");
 			sprintf_s(prevScoreNum, 12, "%6d", App->player->previousScore);
 			App->fonts->BlitText(fontSize * 2.5, fontSize * 2, font, prevScoreNum);
 
-			sprintf_s(currentScore, 6, "SCORE");
-			App->fonts->BlitText(fontSize * 11, fontSize * 1, font, currentScore);
+			App->fonts->BlitText(fontSize * 11, fontSize * 1, font, "SCORE");
 			sprintf_s(currentScoreNum, 12, "%6d", App->player->currentScore);
 			App->fonts->BlitText(fontSize * 10.5, fontSize * 2, font, currentScoreNum);
 
-			sprintf_s(highScore, 8, "H-SCORE");
-			App->fonts->BlitText(fontSize * 18, fontSize * 1, font, highScore);
+			App->fonts->BlitText(fontSize * 18, fontSize * 1, font, "H-SCORE");
 			sprintf_s(highScoreNum, 12, "%6d", App->player->highScore);
 			App->fonts->BlitText(fontSize * 18.5, fontSize * 2, font, highScoreNum);
 
-			sprintf_s(balls, 6, "BALLS");
-			App->fonts->BlitText(fontSize * 19.5, fontSize * 77, font, balls);
+			App->fonts->BlitText(fontSize * 19.5, fontSize * 77, font, "BALLS");
 			sprintf_s(ballsNum, 2, "%1d", App->player->ballCount);
 			App->fonts->BlitText(fontSize * 21.5, fontSize * 78, font, ballsNum);
 
@@ -721,26 +548,21 @@ update_status ModuleSceneIntro::Update()
 			startTitle = true;
 		}
 
-		sprintf_s(gameOverText, 10, "GAME OVER");
-		App->fonts->BlitText(gameOverFontSize * 0.75, gameOverFontSize * 6, gameOverFont, gameOverText);
+		App->fonts->BlitText(gameOverFontSize * 0.75, gameOverFontSize * 6, gameOverFont, "GAME OVER");
 
-		sprintf_s(prevScore, 8, "P-SCORE");
-		App->fonts->BlitText(gameOverFontSize * 1.75, gameOverFontSize * 9.5, gameOverFont, prevScore);
+		App->fonts->BlitText(gameOverFontSize * 1.75, gameOverFontSize * 9.5, gameOverFont, "P-SCORE");
 		sprintf_s(prevScoreNum, 12, "%6d", App->player->previousScore);
 		App->fonts->BlitText(gameOverFontSize * 1.75, gameOverFontSize * 10.5, gameOverFont, prevScoreNum);
 
-		sprintf_s(currentScore, 6, "SCORE");
-		App->fonts->BlitText(gameOverFontSize * 1.75, gameOverFontSize * 12.5, gameOverFont, currentScore);
+		App->fonts->BlitText(gameOverFontSize * 1.75, gameOverFontSize * 12.5, gameOverFont, "SCORE");
 		sprintf_s(currentScoreNum, 12, "%6d", App->player->currentScore);
 		App->fonts->BlitText(gameOverFontSize * 1.75, gameOverFontSize * 13.5, gameOverFont, currentScoreNum);
 
-		sprintf_s(highScore, 8, "H-SCORE");
-		App->fonts->BlitText(gameOverFontSize * 1.75, gameOverFontSize * 15.5, gameOverFont, highScore);
+		App->fonts->BlitText(gameOverFontSize * 1.75, gameOverFontSize * 15.5, gameOverFont, "H-SCORE");
 		sprintf_s(highScoreNum, 12, "%6d", App->player->highScore);
 		App->fonts->BlitText(gameOverFontSize * 1.75, gameOverFontSize * 16.5, gameOverFont, highScoreNum);
 
-		sprintf_s(spaceToContinue, 28, "- Press enter to continue -");
-		App->fonts->BlitText(gameOverFontSize * 0.20, gameOverFontSize * 19, font, spaceToContinue);
+		App->fonts->BlitText(gameOverFontSize * 0.20, gameOverFontSize * 19, font, "- Press enter to continue -");
 		break;
 
 	default:
@@ -773,7 +595,6 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	}
 
 	// Side bumpers
-	srand(time(NULL));
 	int r = (rand() % 100) / 50;
 	if (bodyA == sideBumpy.getFirst()->data && bodyB->listener == (Module*)App->player)
 	{
@@ -796,128 +617,136 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	{
 		if (bodyA == s->data->sensor && bodyB->listener == (Module*)App->player)
 		{
-			p2List_item<Sensor*>* reset;
-			int x, y;
-			b2Vec2 originTP;
-			b2Vec2 forceTP;
 			switch (s->data->value)
 			{
 			case Sensor::DEATH:
-				App->audio->PlayFx(fallFx);
-				App->player->isDead = true;
-				executeOrderSafety = false;
-				pointCounter = 100;
-				reset = sensors.getFirst();
-				while (reset != NULL)
 				{
-					if (reset->data->value == Sensor::PAC_MAN) {
-						reset->data->isActive = false;
+					p2List_item<Sensor*>* reset;
+					App->audio->PlayFx(fallFx);
+					App->player->isDead = true;
+					executeOrderSafety = false;
+					pointCounter = 100;
+					reset = sensors.getFirst();
+					while (reset != NULL)
+					{
+						if (reset->data->value == Sensor::PAC_MAN) {
+							reset->data->isActive = false;
+						}
+						if (reset->data->value == Sensor::CARD) {
+							reset->data->isActive = false;
+						}
+						if (reset->data->value == Sensor::EGG) {
+							reset->data->isActive = false;
+						}
+						if (reset->data->value == Sensor::SAFETY_BUTTON) {
+							reset->data->isActive = true;
+						}
+						if (reset->data->value == Sensor::NUMBER_BUTTON) {
+							reset->data->isActive = true;
+						}
+						reset = reset->next;
 					}
-					if (reset->data->value == Sensor::CARD) {
-						reset->data->isActive = false;
+					if (bonusBody != nullptr)
+					{
+						bonusBool = true;
+						bonusBody->pendingToDelete = true;
 					}
-					if (reset->data->value == Sensor::EGG) {
-						reset->data->isActive = false;
+					if (exitBody == nullptr)
+					{
+						exitBool = true;
+						createExit = true;
 					}
-					if (reset->data->value == Sensor::SAFETY_BUTTON) {
-						reset->data->isActive = true;
-					}
-					if (reset->data->value == Sensor::NUMBER_BUTTON) {
-						reset->data->isActive = true;
-					}
-					reset = reset->next;
+					// should ded the balls
+					return;
 				}
-				if (bonusBody != nullptr)
-				{
-					bonusBool = true;
-					bonusBody->pendingToDelete = true;
-				}
-				if (exitBody == nullptr)
-				{
-					exitBool = true;
-					createExit = true;
-				}
-				// should ded the balls
-				return;
 			case Sensor::CARD:
 				if (s->data->isActive == false) {
 					s->data->isActive = true;
+				}
+				if (s->data->sensorTimer >= 40)
+				{
+					s->data->sensorTimer = 0;
 					App->player->currentScore += 500;
+					App->audio->PlayFx(pathsFx);
 				}
 				// should card the card
 				return;
 			case Sensor::EGG:
-			{
-				int eggCounter = 0;
-				s->data->isActive = true;
-				if (s->data->sensorTimer == 10)
 				{
-					s->data->sensorTimer = 0;
-					s->data->sensor->GetPosition(x, y);
-					if (x == 101) {
-						eggAnim.Update();
+					int x, y;
+					int eggCounter = 0;
+					s->data->isActive = true;
+					if (s->data->sensorTimer >= 50)
+					{
+						App->audio->PlayFx(eggFx);
+						s->data->sensorTimer = 0;
+						s->data->sensor->GetPosition(x, y);
+						if (x == 101) {
+							eggAnim.Update();
+						}
+						if (x == 141) {
+							eggAnim2.Update();
+						}
+						if (x == 181) {
+							eggAnim3.Update();
+						}
 					}
-					if (x == 141) {
-						eggAnim2.Update();
-					}
-					if (x == 181) {
-						eggAnim3.Update();
-					}
-				}
-				else
-				{
-					s->data->sensorTimer++;
-				}
 
-				if ((int)eggAnim.currentFrame == 2) {
-					eggCounter++;
+					if ((int)eggAnim.currentFrame == 2) {
+						eggCounter++;
+					}
+					if ((int)eggAnim2.currentFrame == 2) {
+						eggCounter++;
+					}
+					if ((int)eggAnim3.currentFrame == 2) {
+						eggCounter++;
+					}
+					if (eggCounter == 3) {
+						App->audio->PlayFx(holeSafetyFx);
+						executeOrderSafety = true;
+					}
+					// should egg the eggg
+					return;
 				}
-				if ((int)eggAnim2.currentFrame == 2) {
-					eggCounter++;
-				}
-				if ((int)eggAnim3.currentFrame == 2) {
-					eggCounter++;
-				}
-				if (eggCounter == 3) {
-					executeOrderSafety = true;
-				}
-				// should egg the eggg
-				return;
-			}
 			case Sensor::HUNDREDS:
-				if (s->data->sensorTimer == 10)
+				if (s->data->sensorTimer >= 30)
 				{
 					s->data->sensorTimer = 0;
 					App->player->currentScore += 500;
-				}
-				else
-				{
-					s->data->sensorTimer++;
+					App->audio->PlayFx(pathsFx);
 				}
 				// should money your points
 				return;
 			case Sensor::THOUSAND:
-				if (s->data->sensorTimer == 10)
+				if (s->data->sensorTimer >= 30)
 				{
 					s->data->sensorTimer = 0;
 					App->player->currentScore += 1000;
-				}
-				else
-				{
-					s->data->sensorTimer++;
+					App->audio->PlayFx(pathsFx);
 				}
 				// should money your points a lot more
 				return;
 			case Sensor::TP:
-				bodyB->body->SetTransform(b2Vec2((float)280, (float)360), 0.0f);
-				originTP.x = 282;
-				originTP.y = 362;
-				forceTP.x = bodyB->body->GetWorldCenter().x - originTP.x;
-				forceTP.y = bodyB->body->GetWorldCenter().y - originTP.y;
-				forceTP *= 3;
-				bodyB->body->ApplyLinearImpulse(forceTP, bodyB->body->GetWorldCenter(), true);
-				// should tp to 280, 360 and force ball to left-top
-				return;
+				{
+					App->audio->PlayFx(holeSafetyFx);
+					b2Vec2 originTP;
+					originTP.x = 282;
+					originTP.y = 362;
+					b2Vec2 destinyTP = bodyB->body->GetPosition();
+					destinyTP.x = METERS_TO_PIXELS(destinyTP.x);
+					destinyTP.y = METERS_TO_PIXELS(destinyTP.y);
+					if (destinyTP.y > originTP.y)
+					{
+						bodyB->body->ApplyLinearImpulse({10,-10000.0f}, bodyB->body->GetWorldCenter(), true);
+					}
+					else
+					{
+						bodyB->body->SetLinearVelocity(b2Vec2(0, 0));
+						bodyB->body->SetAngularVelocity(0);
+						bodyB->body->ApplyLinearImpulse(b2Vec2(-1.25,-1.25), bodyB->body->GetWorldCenter(), true);
+					}
+					return;
+				}
 			case Sensor::PAC_MAN:
 				if (s->data->isActive == false)
 				{
@@ -928,23 +757,21 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 				// should pac the man
 				return;
 			case Sensor::POINT_BUTTON:
-				if (s->data->sensorTimer == 15)
+				if (s->data->sensorTimer >= 50)
 				{
 					s->data->sensorTimer = 0;
 					App->player->currentScore += pointCounter;
 					App->audio->PlayFx(buttonFx);
+					bodyB->body->ApplyLinearImpulse(b2Vec2(0.25,0.25), bodyB->body->GetWorldCenter(), true);
 					if (pointCounter < 1000)
 					{
 						pointCounter += 100;
 					}
 				}
-				else
-				{
-					s->data->sensorTimer++;
-				}
 				// should point the button
 				return;
 			case Sensor::SAFETY_BUTTON:
+			{
 				if (s->data->isActive == true && executeOrderSafety == true)
 				{
 					b2Vec2 force(bodyB->body->GetWorldCenter() - bodyA->body->GetWorldCenter());
@@ -954,6 +781,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 					s->data->isActive = false;
 				}
 				// should safety the button
+			}
 			case Sensor::NUMBER_BUTTON:
 				if (s->data->isActive == true)
 				{
@@ -971,4 +799,14 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		s = s->next;
 	}
 	// Yey!
+}
+
+void ModuleSceneIntro::CreateSensor(PhysBody* sensor, Sensor::sensorValue sensorType, bool isActive)
+{
+	Sensor* newSensor = new Sensor;
+	newSensor->sensor = sensor;
+	newSensor->sensor->listener = this;
+	newSensor->value = sensorType;
+	newSensor->isActive = isActive;
+	sensors.add(newSensor);
 }

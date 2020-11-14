@@ -42,6 +42,7 @@ public:
 
 	Kicker kicker;
 	SDL_Rect kickerSect = { 302,706,22,96 };
+	SDL_Rect kickerSectBonus = { 1002,706,22,96 };
 
 	uint clickFx;
 	uint kickerFx;

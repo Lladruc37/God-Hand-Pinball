@@ -51,6 +51,7 @@ public:
 	update_status Update();
 	bool CleanUp();
 	void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
+	void CreateSensor(PhysBody* sensor, Sensor::sensorValue sensorType, bool isActive);
 
 public:
 	p2List<PhysBody*> backgrounds;
@@ -159,42 +160,52 @@ public:
 		170, 114
 	};
 	int TopRightBig[72] = {
-		233, 82,
-		252, 82,
-		274, 93,
-		284, 105,
-		292, 119,
-		300, 145,
-		300, 586,
-		282, 586,
-		282, 570,
-		296, 546,
-		296, 528,
-		290, 520,
-		264, 520,
-		250, 491,
-		250, 415,
-		234, 400,
-		234, 384,
-		256, 364,
-		272, 377,
-		287, 377,
-		295, 368,
-		295, 349,
-		266, 320,
-		266, 294,
-		279, 287,
-		286, 276,
-		292, 263,
-		292, 166,
-		281, 141,
-		270, 134,
-		259, 128,
-		236, 128,
-		225, 133,
-		216, 142,
-		200, 142,
-		200, 114
+	282, 586,
+	300, 586,
+	300, 147,
+	295, 129,
+	292, 119,
+	283, 104,
+	275, 94,
+	263, 87,
+	252, 82,
+	233, 82,
+	200, 115,
+	200, 142,
+	215, 142,
+	223, 134,
+	232, 130,
+	242, 128,
+	254, 128,
+	264, 130,
+	273, 134,
+	283, 144,
+	288, 155,
+	292, 168,
+	292, 262,
+	288, 274,
+	282, 283,
+	275, 289,
+	266, 294,
+	266, 318,
+	294, 346,
+	296, 354,
+	296, 366,
+	293, 373,
+	293, 523,
+	296, 531,
+	296, 544,
+	282, 571
+	};
+	int TopRightTunnelWall[16] = {
+	256, 363,
+	270, 377,
+	270, 520,
+	264, 520,
+	250, 492,
+	250, 415,
+	234, 399,
+	234, 385
 	};
 	int TopRightGreen[22] = {
 		237, 175,
@@ -300,36 +311,25 @@ public:
 	uint wallPacFx;
 	uint buttonFx;
 	uint sideBumperFx;
+	uint pathsFx;
+	uint holeSafetyFx;
+	uint eggFx;
 
 	// Font stuff
 	int font = -1;
 	int fontSize = 12;
 
-	char test[16] = { "\0" };
-
-	char currentScore[6] = { "\0" };
 	char currentScoreNum[12] = { "\0" };
-
-	char highScore[8] = { "\0" };
 	char highScoreNum[12] = { "\0" };
-
-	char prevScore[8] = { "\0" };
 	char prevScoreNum[12] = { "\0" };
-
-	char balls[6] = { "\0" };
 	char ballsNum[2] = { "\0" };
-
 	char pointCounterNum[8] = { "\0" };
-
 
 	Scene currentScene;
 
 	// GAME OVER SCREEN //
 	int gameOverFont = -1;
 	int gameOverFontSize = 32;
-
-	char gameOverText[10] = { "\0" };
-	char spaceToContinue[28] = { "\0" };
 
 	// TITLE SCREEN //
 	SDL_Texture* backgroundTexture = nullptr;

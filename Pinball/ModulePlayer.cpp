@@ -94,7 +94,7 @@ update_status ModulePlayer::Update()
 			isDead = false;
 		}
 
-		if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
+		if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN && App->physics->debug)
 		{
 			circles.add(App->physics->CreateCircle(App->input->GetMouseX(), App->input->GetMouseY(), 10));
 			circles.getLast()->data->listener = this;
@@ -138,8 +138,17 @@ update_status ModulePlayer::Update()
 			App->audio->PlayFx(kickerFx);
 		}
 
-		// Extra ball ----------------------------------------------------
-		if (currentScore != 0 && (currentScore % 50000) == 0) {
+		// Score related ----------------------------------------------------
+		if (currentScore > 999990)
+		{
+			currentScore = 999990;
+		}
+		if (currentScore > highScore)
+		{
+			highScore = currentScore;
+		}
+		if (currentScore != 0 && (currentScore % 50000) == 0)
+		{
 			ballCount++;
 		}
 
@@ -178,23 +187,23 @@ update_status ModulePlayer::Update()
 			c = c->next;
 		}
 
-		p2List_item<Flipper*>* f = flippers.getFirst();
-		while (f != NULL)
+		if (currentScore < 100000 || currentScore >= 150000)
 		{
-			int x, y;
-			f->data->Rect->GetPosition(x, y);
-			App->renderer->Blit(playerText, x, y - 5, false, &rectSect, f->data->rightSide, 1.0f, f->data->Rect->GetRotation());
-			f = f->next;
+			p2List_item<Flipper*>* f = flippers.getFirst();
+			while (f != NULL)
+			{
+				int x, y;
+				f->data->Rect->GetPosition(x, y);
+
+				App->renderer->Blit(playerText, x, y - 5, false, &rectSect, f->data->rightSide, 1.0f, f->data->Rect->GetRotation());
+
+				f = f->next;
+			}
 		}
 	}
 	else
 	{
 		previousScore = currentScore;
-		if (currentScore > highScore)
-		{
-			highScore = currentScore;
-		}
-
 		onceInit = true;
 		isDead = false;
 	}
