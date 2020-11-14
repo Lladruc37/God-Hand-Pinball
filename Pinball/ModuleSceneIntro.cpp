@@ -462,6 +462,8 @@ update_status ModuleSceneIntro::Update()
 
 			SDL_Rect sect = { 350, 0, 336, 954 };
 			App->renderer->Blit(background, 0, 0, true, &sect);
+
+			// Seal blitting
 			App->renderer->Blit(App->player->playerText, 88, 224, false, &sealAnim.GetCurrentFrame());
 			App->renderer->Blit(App->player->playerText, 184, 224, false, &sealAnim.GetCurrentFrame(), true);
 			App->renderer->Blit(App->player->playerText, 96, 206, false, &ballAnim.GetCurrentFrame());
@@ -477,6 +479,7 @@ update_status ModuleSceneIntro::Update()
 			// Card counter
 			int cardCounter = 0;
 
+			// Counting lots of stuf
 			p2List_item<Sensor*>* sensor = sensors.getFirst();
 			while (sensor != NULL)
 			{
@@ -547,10 +550,12 @@ update_status ModuleSceneIntro::Update()
 				sensor = sensor->next;
 			}
 
-			int x, y;
-			App->player->kicker.mobile->GetPosition(x, y);
-			App->renderer->Blit(background, x, y - 88, false, &App->player->kickerSect);
+			// Blitting kicker
+			int kickerX, kickerY;
+			App->player->kicker.mobile->GetPosition(kickerX, kickerY);
+			App->renderer->Blit(background, kickerX, kickerY - 88, false, &App->player->kickerSect);
 
+			// Blitting bumpers
 			p2List_item<Bumper*>* b = bumpers.getFirst();
 			while (b != NULL)
 			{
@@ -560,6 +565,7 @@ update_status ModuleSceneIntro::Update()
 				b = b->next;
 			}
 
+			// Blitting sensors
 			p2List_item<Sensor*>* s = sensors.getFirst();
 			while (s != NULL)
 			{
@@ -748,7 +754,8 @@ update_status ModuleSceneIntro::Update()
 
 void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 {
-	//This will be a fUN function in the future :)
+	// This will be a fUN function in the future :)
+	// Bumpers
 	p2List_item<Bumper*>* b = bumpers.getFirst();
 	while (b != NULL)
 	{
@@ -765,6 +772,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		b = b->next;
 	}
 
+	// Side bumpers
 	srand(time(NULL));
 	int r = (rand() % 100) / 50;
 	if (bodyA == sideBumpy.getFirst()->data && bodyB->listener == (Module*)App->player)
@@ -782,6 +790,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		return;
 	}
 
+	// Sensors
 	p2List_item<Sensor*>* s = sensors.getFirst();
 	while (s != NULL)
 	{
@@ -961,4 +970,5 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		}
 		s = s->next;
 	}
+	// Yey!
 }
