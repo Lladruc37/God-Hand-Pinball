@@ -92,6 +92,7 @@ update_status ModulePlayer::Update()
 			currentScore = 0;
 			onceInit = false;
 			isDead = false;
+			onceBall = true;
 		}
 
 		if (App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN && App->physics->debug)
@@ -134,7 +135,7 @@ update_status ModulePlayer::Update()
 		}
 		else if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_UP)
 		{
-			kicker.mobile->body->ApplyForce({ 0,-150 }, { 0,0 }, true);
+			kicker.mobile->body->ApplyForce({ 0,-110 }, { 0,0 }, true);
 			App->audio->PlayFx(kickerFx);
 		}
 
@@ -147,9 +148,14 @@ update_status ModulePlayer::Update()
 		{
 			highScore = currentScore;
 		}
-		if (currentScore != 0 && (currentScore % 50000) == 0)
+		
+		if (currentScore != 0 && currentScore > 50000)
 		{
-			ballCount++;
+			if (onceBall)
+			{
+				ballCount++;
+				onceBall = false;
+			}
 		}
 
 		// Game Overs ----------------------------------------------------

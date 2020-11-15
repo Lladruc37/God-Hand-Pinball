@@ -47,6 +47,7 @@ public:
 	uint clickFx;
 	uint kickerFx;
 
+	bool onceBall = true;
 	int currentScore = 0;
 	int previousScore;
 	int highScore = 0;

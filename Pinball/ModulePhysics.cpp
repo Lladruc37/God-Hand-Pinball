@@ -225,8 +225,15 @@ update_status ModulePhysics::PostUpdate()
 	if(App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN && App->scene_intro->currentScene == Scene::PINBALL)
 		debug = !debug;
 
-	if(!debug)
+	if (!debug)
+	{
+		if (mouse_joint != nullptr)
+		{
+			world->DestroyJoint(mouse_joint);
+			mouse_joint = nullptr;
+		}
 		return UPDATE_CONTINUE;
+	}
 
 	// Bonus code: this will iterate all objects in the world and draw the circles
 	// You need to provide your own macro to translate meters to pixels
