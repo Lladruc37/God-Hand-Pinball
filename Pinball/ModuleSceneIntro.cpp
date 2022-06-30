@@ -25,17 +25,17 @@ bool ModuleSceneIntro::Start()
 	bool ret = true;
 	App->renderer->camera.x = App->renderer->camera.y = 0;
 
-	background = App->textures->Load("pinball/Background.png");
-	font = App->fonts->Load("pinball/nesfont.png", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{:}~ª", 6);
+	background = App->textures->Load("Game/pinball/Background.png");
+	font = App->fonts->Load("Game/pinball/nesfont.png", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{:}~ª", 6);
 
-	bumperFx = App->audio->LoadFx("pinball/audio/fx/Bumper.wav");
-	fallFx = App->audio->LoadFx("pinball/audio/fx/PeachFall.wav");
-	wallPacFx = App->audio->LoadFx("pinball/audio/fx/WallButton_PacMan.wav");
-	buttonFx = App->audio->LoadFx("pinball/audio/fx/PointButton_SafetyButton.wav");
-	sideBumperFx = App->audio->LoadFx("pinball/audio/fx/SideBumpers.wav");
-	pathsFx = App->audio->LoadFx("pinball/audio/fx/Paths.wav");
-	holeSafetyFx = App->audio->LoadFx("pinball/audio/fx/Hole_SpawnSafety.wav");
-	eggFx = App->audio->LoadFx("pinball/audio/fx/PinkPlatform_BreakOpenEgg.wav");
+	bumperFx = App->audio->LoadFx("Game/pinball/audio/fx/Bumper.wav");
+	fallFx = App->audio->LoadFx("Game/pinball/audio/fx/PeachFall.wav");
+	wallPacFx = App->audio->LoadFx("Game/pinball/audio/fx/WallButton_PacMan.wav");
+	buttonFx = App->audio->LoadFx("Game/pinball/audio/fx/PointButton_SafetyButton.wav");
+	sideBumperFx = App->audio->LoadFx("Game/pinball/audio/fx/SideBumpers.wav");
+	pathsFx = App->audio->LoadFx("Game/pinball/audio/fx/Paths.wav");
+	holeSafetyFx = App->audio->LoadFx("Game/pinball/audio/fx/Hole_SpawnSafety.wav");
+	eggFx = App->audio->LoadFx("Game/pinball/audio/fx/PinkPlatform_BreakOpenEgg.wav");
 
 	// Sensors
 	CreateSensor(App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 10, b2_staticBody), Sensor::DEATH, false);
@@ -161,12 +161,12 @@ bool ModuleSceneIntro::Start()
 
 	// TITLE SCREEN //
 	currentScene = TITLE_SCREEN;
-	backgroundTexture = App->textures->Load("pinball/titleScreen.png");
-	App->audio->PlayMusic("pinball/audio/music/TitleScreen.ogg", 0);
+	backgroundTexture = App->textures->Load("Game/pinball/titleScreen.png");
+	App->audio->PlayMusic("Game/pinball/audio/music/TitleScreen.ogg", 0);
 	startTitle = false;
 
 	// GAME OVER //
-	gameOverFont = App->fonts->Load("pinball/bignesfont.png", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{:}~ª", 6);
+	gameOverFont = App->fonts->Load("Game/pinball/bignesfont.png", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{:}~ª", 6);
 
 	// BONUS //
 	bonusBool = true;
@@ -234,12 +234,12 @@ update_status ModuleSceneIntro::Update()
 		if (startTitle)
 		{
 			startTitle = false;
-			App->audio->PlayMusic("pinball/audio/music/TitleScreen.ogg", 0.0f);
+			App->audio->PlayMusic("Game/pinball/audio/music/TitleScreen.ogg", 0.0f);
 		}
 
 		if (App->input->GetKey(SDL_SCANCODE_RETURN) == KEY_STATE::KEY_DOWN) {
 			currentScene = PINBALL;
-			App->audio->PlayMusic("pinball/audio/music/silence.ogg");
+			App->audio->PlayMusic("Game/pinball/audio/music/silence.ogg");
 		}
 
 		App->renderer->Blit(backgroundTexture, 0, 0, true);
@@ -293,7 +293,7 @@ update_status ModuleSceneIntro::Update()
 						App->renderer->Blit(background, 0, 0, true, &bonusSect);
 						if (bonusBool) {
 							bonusBool = false;
-							App->audio->PlayMusic("pinball/audio/music/bonus.ogg", 0.0f, 0);
+							App->audio->PlayMusic("Game/pinball/audio/music/bonus.ogg", 0.0f, 0);
 							bonusBody = App->physics->CreateCircle(154, 897, 12, b2_staticBody);
 						}
 						int x, y;
